@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_home">
+
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="com.example.smartcart.ui.home.HomeFragment"
+        android:label="@string/title_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_navigation_home_to_shopping"
+            app:destination="@id/navigation_shopping" />
+        <action
+            android:id="@+id/action_navigation_home_to_not_shopping"
+            app:destination="@id/navigation_not_shopping" />
+        <action
+            android:id="@+id/action_navigation_home_to_camera"
+            app:destination="@id/navigation_camera" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_shopping"
+        android:name="com.example.smartcart.ui.shopping.ShoppingFragment"
+        android:label="fragment_shopping"
+        tools:layout="@layout/fragment_shopping" />
+    <fragment
+        android:id="@+id/navigation_not_shopping"
+        android:name="com.example.smartcart.ui.not_shopping.NotShoppingFragment"
+        android:label="fragment_not_shopping"
+        tools:layout="@layout/fragment_not_shopping" />
+    <fragment
+        android:id="@+id/navigation_camera"
+        android:name="com.example.smartcart.ui.camera.CameraFragment"
+        android:label="fragment_camera"
+        tools:layout="@layout/fragment_camera" />
+
+</navigation>

@@ -9,7 +9,7 @@
     <SurfaceView
         android:id="@+id/surface_view"
         android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_height="550dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -55,6 +55,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/barcode_text">
         <TableLayout
+            android:id="@+id/previous_scanned_table"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <TableRow
@@ -67,7 +68,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="start"
                     android:gravity="start"
-                    android:textSize="15sp" />
+                    android:textSize="25sp" />
             </TableRow>
             <TableRow
                 android:layout_width="match_parent"
@@ -79,7 +80,19 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="start"
                     android:gravity="start"
-                    android:textSize="15sp" />
+                    android:textSize="25sp" />
+            </TableRow>
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/previous_scanned3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:gravity="start"
+                    android:textSize="25sp" />
             </TableRow>
         </TableLayout>
     </ScrollView>

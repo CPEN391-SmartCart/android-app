@@ -13,6 +13,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.ScrollView;
 import android.widget.Switch;
+import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
@@ -23,6 +24,10 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,15 +36,14 @@ public class MainActivity extends AppCompatActivity {
     private BarcodeDetector barcodeDetector;
     private CameraSource cameraSource;
     private static final int REQUEST_CAMERA_PERMISSION = 201;
+    private static final int PREVIOUSLY_SCANNED_BARCODE_QUEUE_SIZE = 3;
     private ToneGenerator toneGen1;
     private TextView barcodeText;
     private Switch autoManualSwitch;
     private FloatingActionButton caputureButton;
-    private TextView previousScannedView;
-    private TextView previousScannedView2;
+    private ArrayList<TextView> previouslyScannedViews;
+    private PriorityQueue<String> previouslyScannedBarcodes;
     private String barcodeData;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,13 +54,12 @@ public class MainActivity extends AppCompatActivity {
         barcodeText = findViewById(R.id.barcode_text);
         autoManualSwitch = findViewById(R.id.auto_manual);
         caputureButton = findViewById(R.id.capture);
-        previousScannedView = findViewById(R.id.previous_scanned);
-        previousScannedView2 = findViewById(R.id.previous_scanned2);
+        previouslyScannedViews = new ArrayList<TextView>();
+        previouslyScannedViews.add(findViewById(R.id.previous_scanned3));
+        previouslyScannedViews.add(findViewById(R.id.previous_scanned2));
+        previouslyScannedViews.add(findViewById(R.id.previous_scanned));
+        previouslyScannedBarcodes = new PriorityQueue<String>() ;
         initialiseDetectorsAndSources();
-
-        previousScannedView.setText("Hello World");
-        previousScannedView2.setText("Hello World2");
-
     }
 
     private void initialiseDetectorsAndSources() {
@@ -121,17 +124,25 @@ public class MainActivity extends AppCompatActivity {
                             if (barcodes.valueAt(0).email != null) {
                                 barcodeText.removeCallbacks(null);
                                 barcodeData = barcodes.valueAt(0).email.address;
-                                barcodeText.setText(barcodeData);
-
-                                toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP, 150);
+                                toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP, 500);
                             } else {
 
                                 barcodeData = barcodes.valueAt(0).displayValue;
-                                barcodeText.setText(barcodeData);
                                 toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP, 150);
 
                             }
-
+                            barcodeText.setText(barcodeData);
+                            previouslyScannedBarcodes.add(barcodeData);
+                            while(previouslyScannedBarcodes.size()>PREVIOUSLY_SCANNED_BARCODE_QUEUE_SIZE)
+                            {
+                                previouslyScannedBarcodes.remove();
+                            }
+                            int i =0;
+                            for(String barcode : previouslyScannedBarcodes)
+                            {
+                                previouslyScannedViews.get(i).setText(barcode);
+                                i++;
+                            }
                         }
                     });
 

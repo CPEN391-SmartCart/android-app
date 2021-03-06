@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private Switch autoManualSwitch;
     private FloatingActionButton caputureButton;
     private TextView previousScannedView;
+    private TextView previousScannedView2;
     private String barcodeData;
 
 
@@ -50,9 +51,12 @@ public class MainActivity extends AppCompatActivity {
         autoManualSwitch = findViewById(R.id.auto_manual);
         caputureButton = findViewById(R.id.capture);
         previousScannedView = findViewById(R.id.previous_scanned);
+        previousScannedView2 = findViewById(R.id.previous_scanned2);
         initialiseDetectorsAndSources();
 
         previousScannedView.setText("Hello World");
+        previousScannedView2.setText("Hello World2");
+
     }
 
     private void initialiseDetectorsAndSources() {

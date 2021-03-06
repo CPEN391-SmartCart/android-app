@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">BarCodeScanner</string>
+    <string name="auto_manual_text">Auto</string>
+    <string name="barcode_text_text">Current Barcode</string>
+    <string name="capture_content_desc">Hello World 2</string>
 </resources>

@@ -22,7 +22,7 @@
         android:layout_marginTop="5dp"
         android:layout_marginRight="30dp"
         android:padding="5dp"
-        android:text="Barcode Text"
+        android:text="@string/barcode_text_text"
         android:textSize="25sp"
         app:layout_constraintTop_toBottomOf="@id/surface_view" />
 
@@ -30,7 +30,7 @@
         android:id="@+id/auto_manual"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Auto"
+        android:text="@string/auto_manual_text"
         app:layout_constraintBottom_toBottomOf="@id/surface_view"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="@id/surface_view"
@@ -44,7 +44,9 @@
         app:backgroundTint="@color/white"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/surface_view"/>
+        app:layout_constraintBottom_toBottomOf="@id/surface_view"
+        android:focusable="true"
+        android:contentDescription="@string/capture_content_desc" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -52,19 +54,34 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/barcode_text">
-
-        <TableRow
+        <TableLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/previous_scanned"
+            android:layout_height="wrap_content">
+            <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:gravity="left"
-                android:textSize="15sp" />
-        </TableRow>
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/previous_scanned"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:gravity="start"
+                    android:textSize="15sp" />
+            </TableRow>
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/previous_scanned2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:gravity="start"
+                    android:textSize="15sp" />
+            </TableRow>
+        </TableLayout>
     </ScrollView>
 
 

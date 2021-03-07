@@ -6,7 +6,6 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
 
-
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
@@ -19,14 +18,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BarCodeScanner"
         tools:ignore="GoogleAppIndexingWarning">
-
-        <!--<provider
+        <activity android:name=".WeightActivity"></activity>
+        <!--
+        <provider
             &lt;!&ndash;android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.barcodescanner.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">&ndash;&gt;
 
-        </provider>-->
+        </provider>
+        -->
         <meta-data
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="barcode" />

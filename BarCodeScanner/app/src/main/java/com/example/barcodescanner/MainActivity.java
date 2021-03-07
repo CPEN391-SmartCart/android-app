@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
@@ -11,11 +12,10 @@ import android.os.Bundle;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.ScrollView;
+import android.view.View;
 import android.widget.Switch;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
@@ -25,9 +25,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Deque;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.LinkedList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,13 +35,15 @@ public class MainActivity extends AppCompatActivity {
     private CameraSource cameraSource;
     private static final int REQUEST_CAMERA_PERMISSION = 201;
     private static final int PREVIOUSLY_SCANNED_BARCODE_QUEUE_SIZE = 3;
+    private static final long AUTOMATIC_BARCODE_SCAN_DELAY_MS = 1000;
     private ToneGenerator toneGen1;
     private TextView barcodeText;
     private Switch autoManualSwitch;
-    private FloatingActionButton caputureButton;
+    private FloatingActionButton captureButton;
     private ArrayList<TextView> previouslyScannedViews;
-    private PriorityQueue<String> previouslyScannedBarcodes;
+    private LinkedList<String> previouslyScannedBarcodes;
     private String barcodeData;
+    private long lastBarcodeUpdate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,18 +53,27 @@ public class MainActivity extends AppCompatActivity {
         surfaceView = findViewById(R.id.surface_view);
         barcodeText = findViewById(R.id.barcode_text);
         autoManualSwitch = findViewById(R.id.auto_manual);
-        caputureButton = findViewById(R.id.capture);
+        captureButton = findViewById(R.id.capture);
         previouslyScannedViews = new ArrayList<TextView>();
         previouslyScannedViews.add(findViewById(R.id.previous_scanned3));
         previouslyScannedViews.add(findViewById(R.id.previous_scanned2));
         previouslyScannedViews.add(findViewById(R.id.previous_scanned));
-        previouslyScannedBarcodes = new PriorityQueue<String>() ;
+        previouslyScannedBarcodes = new LinkedList<String>() ;
+        barcodeData = "";
         initialiseDetectorsAndSources();
     }
 
     private void initialiseDetectorsAndSources() {
 
         //Toast.makeText(getApplicationContext(), "Barcode scanner started", Toast.LENGTH_SHORT).show();
+        captureButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                barcodeData += "X";
+                Toast.makeText(getApplicationContext(), "Barcode" + barcodeData, Toast.LENGTH_SHORT).show();
+                processNewBarcode();
+
+            }
+        });
 
         barcodeDetector = new BarcodeDetector.Builder(this)
                 .setBarcodeFormats(Barcode.ALL_FORMATS)
@@ -132,17 +141,11 @@ public class MainActivity extends AppCompatActivity {
 
                             }
                             barcodeText.setText(barcodeData);
-                            previouslyScannedBarcodes.add(barcodeData);
-                            while(previouslyScannedBarcodes.size()>PREVIOUSLY_SCANNED_BARCODE_QUEUE_SIZE)
-                            {
-                                previouslyScannedBarcodes.remove();
+                            if(autoManualSwitch.isChecked() && (System.currentTimeMillis()-lastBarcodeUpdate>AUTOMATIC_BARCODE_SCAN_DELAY_MS)) {
+                                processNewBarcode();
+                                lastBarcodeUpdate = System.currentTimeMillis();
                             }
-                            int i =0;
-                            for(String barcode : previouslyScannedBarcodes)
-                            {
-                                previouslyScannedViews.get(i).setText(barcode);
-                                i++;
-                            }
+
                         }
                     });
 
@@ -151,6 +154,28 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void transitionToWeightActivity()
+    {
+        Intent intent = new Intent(this, WeightActivity.class);
+        startActivity(intent);
+
+    }
+
+    private void processNewBarcode()
+    {
+        previouslyScannedBarcodes.addLast(barcodeData);
+        while(previouslyScannedBarcodes.size()>PREVIOUSLY_SCANNED_BARCODE_QUEUE_SIZE)
+        {
+            previouslyScannedBarcodes.poll();
+        }
+        int i =0;
+        for(String barcode : previouslyScannedBarcodes)
+        {
+            previouslyScannedViews.get(i).setText(barcode);
+            i++;
+        }
+        transitionToWeightActivity();
+    }
 
     @Override
     protected void onPause() {

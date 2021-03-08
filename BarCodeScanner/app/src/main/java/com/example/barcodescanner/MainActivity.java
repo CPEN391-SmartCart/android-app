@@ -29,7 +29,7 @@ import java.util.LinkedList;
 
 public class MainActivity extends AppCompatActivity {
 
-
+    public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
     private SurfaceView surfaceView;
     private BarcodeDetector barcodeDetector;
     private CameraSource cameraSource;
@@ -65,13 +65,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void initialiseDetectorsAndSources() {
 
-        //Toast.makeText(getApplicationContext(), "Barcode scanner started", Toast.LENGTH_SHORT).show();
         captureButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                barcodeData += "X";
-                Toast.makeText(getApplicationContext(), "Barcode" + barcodeData, Toast.LENGTH_SHORT).show();
                 processNewBarcode();
-
             }
         });
 
@@ -157,12 +153,13 @@ public class MainActivity extends AppCompatActivity {
     private void transitionToWeightActivity()
     {
         Intent intent = new Intent(this, WeightActivity.class);
+        intent.putExtra(EXTRA_MESSAGE, barcodeData);
         startActivity(intent);
-
     }
 
     private void processNewBarcode()
     {
+        Toast.makeText(getApplicationContext(), "Scanned barcode " + barcodeData, Toast.LENGTH_SHORT).show();
         previouslyScannedBarcodes.addLast(barcodeData);
         while(previouslyScannedBarcodes.size()>PREVIOUSLY_SCANNED_BARCODE_QUEUE_SIZE)
         {
@@ -174,7 +171,14 @@ public class MainActivity extends AppCompatActivity {
             previouslyScannedViews.get(i).setText(barcode);
             i++;
         }
-        transitionToWeightActivity();
+        if(barcodeData.toLowerCase().contains("apple"))
+        {
+            transitionToWeightActivity();
+        }
+        else
+        {
+            Toast.makeText(getApplicationContext(), "Added " + barcodeData + " to your cart", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

@@ -6,4 +6,6 @@
     <string name="current_weight">Weight</string>
     <string name="current_cost">Cost</string>
     <string name="current_item_name">Fuji Apple</string>
+    <string name="current_item_cost">$1.29 / lb</string>
+    <string name="add_to_cart">Add to Cart</string>
 </resources>

@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="140dp"
         android:layout_marginLeft="30dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="70dp"
         android:layout_marginRight="30dp"
         android:gravity="center_horizontal"
         android:textAlignment="center"
@@ -49,10 +49,13 @@
         android:layout_marginLeft="30dp"
         android:layout_marginTop="30dp"
         android:layout_marginRight="30dp"
+        android:gravity="end"
+        android:textAlignment="viewEnd"
         android:padding="5dp"
-        android:text="@string/current_item_name"
+        android:text="@string/current_item_cost"
         android:textSize="40sp"
-        app:layout_constraintTop_toBottomOf="@id/weight_item_name_text"/>
+        app:layout_constraintTop_toBottomOf="@id/weight_item_name_text"
+         />
 
     <Button
         android:id="@+id/weight_add_cart_button"
@@ -61,7 +64,7 @@
         android:layout_marginLeft="30dp"
         android:layout_marginTop="40dp"
         android:layout_marginRight="30dp"
-        android:text="Button"
+        android:text="@string/add_to_cart"
         android:textSize="30sp"
         app:layout_constraintTop_toBottomOf="@id/weight_item_price_text"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

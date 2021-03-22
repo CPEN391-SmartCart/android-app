@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.example.smartcart.R;
 import com.example.smartcart.ui.shopping.ShoppingListItem;
@@ -48,6 +49,7 @@ public class WeightFragment extends Fragment {
                 Toast.makeText(requireActivity(), "Added " + message + " costing " + costString, Toast.LENGTH_SHORT).show();
                 // TODO: perform look up to get price
                 shoppingViewModel.addShoppingListItem(new ShoppingListItem(1, shoppingViewModel.getNextItemName(), 6.9));
+                Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_weight_to_navigation_camera);
             }
         });
 

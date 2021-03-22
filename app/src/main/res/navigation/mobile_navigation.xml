@@ -40,8 +40,8 @@
         android:label="fragment_camera"
         tools:layout="@layout/fragment_camera" >
         <action
-            android:id="@+id/action_navigation_camera_to_weight_fragment"
-            app:destination="@id/weight_fragment" />
+            android:id="@+id/action_navigation_camera_to_navigation_weight"
+            app:destination="@id/navigation_weight" />
     </fragment>
     <fragment
         android:id="@+id/navigation_search"
@@ -52,9 +52,13 @@
             app:destination="@id/navigation_shopping" />
     </fragment>
     <fragment
-        android:id="@+id/weight_fragment"
+        android:id="@+id/navigation_weight"
         android:name="com.example.smartcart.ui.camera.WeightFragment"
         android:label="fragment_weight"
-        tools:layout="@layout/fragment_weight" />
+        tools:layout="@layout/fragment_weight" >
+        <action
+            android:id="@+id/action_navigation_weight_to_navigation_camera"
+            app:destination="@id/navigation_camera" />
+    </fragment>
 
 </navigation>

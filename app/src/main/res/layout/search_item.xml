@@ -6,7 +6,7 @@
     android:layout_height="wrap_content">
 
     <LinearLayout
-        android:id="@+id/linearLayout2"
+        android:id="@+id/search_item_layout"
         android:layout_width="match_parent"
         android:layout_height="34dp"
         android:background="#ffffff"
@@ -14,39 +14,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:padding="5dp"
-        android:weightSum="10">
-
-        <TextView
-            android:id="@+id/quantity"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="TextView" />
+        android:weightSum="4"
+        android:clickable="true">
 
         <TextView
             android:id="@+id/itemName"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="6"
+            android:layout_weight="1"
             android:text="TextView" />
 
         <TextView
             android:id="@+id/price"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="2"
-            android:text="TextView" />
-
-        <ImageButton
-            android:id="@+id/remove"
-            android:layout_width="0dp"
-            android:layout_height="24dp"
-            android:adjustViewBounds="true"
-            android:contentDescription="TODO"
-            android:background="?android:selectableItemBackground"
-            android:scaleType="fitStart"
             android:layout_weight="1"
-            android:src="@drawable/ic_remove" />
+            android:text="TextView" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

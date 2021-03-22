@@ -23,8 +23,12 @@
     <fragment
         android:id="@+id/navigation_shopping"
         android:name="com.example.smartcart.ui.shopping.ShoppingFragment"
-        android:label="fragment_shopping"
-        tools:layout="@layout/fragment_shopping" />
+        android:label="ShoppingList"
+        tools:layout="@layout/fragment_shopping" >
+        <action
+            android:id="@+id/action_navigation_shopping_to_navigation_search"
+            app:destination="@id/navigation_search" />
+    </fragment>
     <fragment
         android:id="@+id/navigation_not_shopping"
         android:name="com.example.smartcart.ui.not_shopping.NotShoppingFragment"
@@ -34,6 +38,23 @@
         android:id="@+id/navigation_camera"
         android:name="com.example.smartcart.ui.camera.CameraFragment"
         android:label="fragment_camera"
-        tools:layout="@layout/fragment_camera" />
+        tools:layout="@layout/fragment_camera" >
+        <action
+            android:id="@+id/action_navigation_camera_to_weight_fragment"
+            app:destination="@id/weight_fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_search"
+        android:name="com.example.smartcart.ui.search.ItemSearchFragment"
+        android:label="ItemSearchFragment">
+        <action
+            android:id="@+id/action_navigation_search_to_navigation_shopping"
+            app:destination="@id/navigation_shopping" />
+    </fragment>
+    <fragment
+        android:id="@+id/weight_fragment"
+        android:name="com.example.smartcart.ui.camera.WeightFragment"
+        android:label="fragment_weight"
+        tools:layout="@layout/fragment_weight" />
 
 </navigation>

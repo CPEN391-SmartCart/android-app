@@ -1,150 +1,101 @@
 package com.example.smartcart.ui.shopping;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.smartcart.R;
+import com.example.smartcart.ui.search.ItemSearchFragment;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
 
 public class ShoppingFragment extends Fragment {
 
     private ShoppingViewModel shoppingViewModel;
-
-    private RecyclerView recycler;
-
-    PopupWindow popUp;
-    boolean click = true;
-
-    private ArrayList<ShoppingListItem> shopping_list = new ArrayList<>();
     private ShoppingListItemAdapter adapter;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         shoppingViewModel =
-                new ViewModelProvider(this).get(ShoppingViewModel.class);
+                new ViewModelProvider(requireActivity()).get(ShoppingViewModel.class);
         View root = inflater.inflate(R.layout.fragment_shopping, container, false);
-        final TextView textView = root.findViewById(R.id.text_shopping);
-        shoppingViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
+        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
 
         // recycler
-        recycler = (RecyclerView) root.findViewById(R.id.recycler);
+        RecyclerView recycler = root.findViewById(R.id.recycler);
+        recycler.addItemDecoration(new DividerItemDecoration(getActivity().getApplicationContext(),
+                DividerItemDecoration.VERTICAL));
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recycler.setLayoutManager(layoutManager);
-        adapter = new ShoppingListItemAdapter(getActivity().getApplicationContext(), shopping_list);
+        // create onClickListener here so that we can use shoppingViewModel
+        View.OnClickListener remove_item = v -> {
+            LinearLayout layout = (LinearLayout) v.getParent();
+            TextView itemName = layout.findViewById(R.id.itemName);
+            shoppingViewModel.removeShoppingListItem(itemName.getText().toString());
+            adapter.refreshList(shoppingViewModel.getShoppingList().getValue());
+            adapter.notifyDataSetChanged();
+        };
+        adapter = new ShoppingListItemAdapter(getActivity().getApplicationContext(), shoppingViewModel.getShoppingList().getValue(), remove_item);
         recycler.setAdapter(adapter);
 
-        // Add Items to cart
-        Button but = root.findViewById(R.id.button);
-        LinearLayout layout = new LinearLayout(getActivity().getApplicationContext());
-        but.setOnClickListener(v -> {
-            if (click) {
-                popUp.showAtLocation(layout, Gravity.BOTTOM, 10, 10);
-                popUp.update(50, 50, 300, 80);
-                click = false;
-            } else {
-                popUp.dismiss();
-                click = true;
+        // for adding App Bar button
+        setHasOptionsMenu(true);
+
+        // cart_total
+        TextView cart_total = root.findViewById(R.id.total_cart);
+        shoppingViewModel.total.observe(getActivity(), new Observer<BigDecimal>() {
+            @Override
+            public void onChanged(BigDecimal bigDecimal) {
+                cart_total.setText(String.format("Total: $%s", shoppingViewModel.total.getValue().toString()));
             }
         });
 
-        // filler text
-        shopping_list.add(new ShoppingListItem("1", "Pickles", "$9.90"));
-        shopping_list.add(new ShoppingListItem("1", "Pickles", "$9.90"));
+        // checkout
+        Button checkout = (Button) root.findViewById(R.id.checkout);
+        checkout.setOnClickListener(v -> {
+            //TODO: call payment api, make ui for it
+        });
+
         adapter.notifyDataSetChanged();
         return root;
     }
 
-    public void addItems(View v) {
-        //shopping_list.add();
-        adapter.notifyDataSetChanged();
+    /**
+     * Adds a button to the menu bar
+     */
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.add_item_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
-    class ShoppingListItem {
-        public String quantity;
-        public String item_name;
-        public String price;
+    /**
+     * This functions as a onclick listener for the button
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
 
-        public ShoppingListItem(String quantity, String item_name, String price) {
-            this.quantity = quantity;
-            this.item_name = item_name;
-            this.price = price;
+        if (id == R.id.add_item_button) {
+            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_shopping_to_navigation_search);
         }
+        return super.onOptionsItemSelected(item);
     }
-
-    public class ShoppingListItemAdapter extends RecyclerView.Adapter<ShoppingListItemAdapter.ShoppingListItemViewHolder>{
-        private LayoutInflater inflater;
-        private Context context;
-        ArrayList<ShoppingListItem> shopping_list;
-
-        public ShoppingListItemAdapter(Context context, ArrayList<ShoppingListItem> shopping_list) {
-            inflater = LayoutInflater.from(context);
-            this.context = context;
-            this.shopping_list = shopping_list;
-        }
-
-        @Override
-        public ShoppingListItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = inflater.inflate(R.layout.shopping_list_item, parent, false);
-            return new ShoppingListItemViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(ShoppingListItemViewHolder holder, int position) {
-            holder.quantity.setText(shopping_list.get(position).quantity);
-            holder.item_name.setText(shopping_list.get(position).item_name);
-            holder.price.setText(shopping_list.get(position).price);
-            holder.remove.setOnClickListener(v -> {
-                shopping_list.remove(position);
-                adapter.notifyDataSetChanged();
-            });
-        }
-
-        @Override
-        public int getItemCount() {
-            return shopping_list.size();
-        }
-
-        public class ShoppingListItemViewHolder extends RecyclerView.ViewHolder {
-
-            private TextView quantity;
-            private TextView item_name;
-            private TextView price;
-            private ImageButton remove;
-
-            public ShoppingListItemViewHolder(View itemView) {
-                super(itemView);
-                quantity = (TextView) itemView.findViewById(R.id.quantity);
-                item_name = (TextView) itemView.findViewById(R.id.item_name);
-                price = (TextView) itemView.findViewById(R.id.price);
-                remove = (ImageButton) itemView.findViewById(R.id.remove);
-            }
-        }
-    }
-
-
 }

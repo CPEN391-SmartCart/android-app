@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -23,6 +24,8 @@ public class NotShoppingFragment extends Fragment {
         notShoppingViewModel =
                 new ViewModelProvider(this).get(NotShoppingViewModel.class);
         View root = inflater.inflate(R.layout.fragment_not_shopping, container, false);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+
         final TextView textView = root.findViewById(R.id.text_not_shopping);
         notShoppingViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override

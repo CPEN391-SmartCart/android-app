@@ -23,10 +23,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.smartcart.Home;
+import com.example.smartcart.HomeActivity;
 import com.example.smartcart.R;
-import com.example.smartcart.ui.login.LoginViewModel;
-import com.example.smartcart.ui.login.LoginViewModelFactory;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -125,7 +123,7 @@ public class LoginActivity extends AppCompatActivity {
         String welcome = getString(R.string.welcome) + model.getDisplayName();
         // TODO : initiate successful logged in experience
         Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
-        Intent go_to_home = new Intent(this, Home.class);
+        Intent go_to_home = new Intent(this, HomeActivity.class);
         startActivity(go_to_home);
     }
 

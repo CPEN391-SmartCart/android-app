@@ -4,9 +4,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.SearchView;
 
-import com.example.smartcart.ui.search.ItemSearchFragment;
+import com.example.smartcart.ui.shopping.ShoppingItemSearchFragment;
 import com.example.smartcart.ui.shopping.ShoppingFragment;
 import com.example.smartcart.ui.shopping.ShoppingViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -44,7 +43,7 @@ public class HomeActivity extends AppCompatActivity {
         System.out.println(f.toString());
         System.out.println(getSupportFragmentManager().getBackStackEntryCount());
         System.out.println(getSupportFragmentManager().getFragments());
-        if (f instanceof ItemSearchFragment) {
+        if (f instanceof ShoppingItemSearchFragment) {
             getSupportFragmentManager().beginTransaction().replace(R.id.nav_host_fragment, ShoppingFragment.class, null).addToBackStack("").commit();
         } else {
             super.onBackPressed();

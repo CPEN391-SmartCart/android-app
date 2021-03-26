@@ -163,7 +163,9 @@ public class CameraFragment extends Fragment {
             i++;
         }
         if(barcodeData.toLowerCase().contains("apple")) {
-            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_camera_to_navigation_weight);
+            Bundle bundle = new Bundle();
+            bundle.putString("barcodeData", barcodeData);
+            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_camera_to_navigation_weight, bundle);
         }
         else {
             Toast.makeText(getContext(), "Added " + barcodeData + " to your cart", Toast.LENGTH_SHORT).show();

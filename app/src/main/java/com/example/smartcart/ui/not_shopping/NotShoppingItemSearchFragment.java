@@ -1,4 +1,4 @@
-package com.example.smartcart.ui.search;
+package com.example.smartcart.ui.not_shopping;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,7 +19,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.smartcart.R;
-import com.example.smartcart.ui.shopping.ShoppingViewModel;
+import com.example.smartcart.ui.shopping.ShoppingQuantityDialogFragment;
+import com.example.smartcart.ui.search.SearchItem;
+import com.example.smartcart.ui.search.SearchItemAdapter;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -27,16 +29,16 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class ItemSearchFragment extends Fragment {
+public class NotShoppingItemSearchFragment extends Fragment {
 
-    private ShoppingViewModel shoppingViewModel;
+    private NotShoppingViewModel notShoppingViewModel;
     private final ArrayList<SearchItem> item_list = new ArrayList<>();
     private SearchItemAdapter adapter;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        shoppingViewModel = new ViewModelProvider(requireActivity()).get(ShoppingViewModel.class);
+        notShoppingViewModel = new ViewModelProvider(requireActivity()).get(NotShoppingViewModel.class);
         View root = inflater.inflate(R.layout.fragment_search, container, false);
         setHasOptionsMenu(true);
 
@@ -47,13 +49,13 @@ public class ItemSearchFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recycler.setLayoutManager(layoutManager);
         View.OnClickListener add_item = v -> {
-                TextView itemName = v.findViewById(R.id.itemName);
-                shoppingViewModel.setNextItemName(itemName.getText().toString());
-                TextView price = v.findViewById(R.id.price);
-                shoppingViewModel.setNextPrice(new BigDecimal(price.getText().toString().substring(1)));
+            TextView itemName = v.findViewById(R.id.itemName);
+            notShoppingViewModel.setNextItemName(itemName.getText().toString());
+            TextView price = v.findViewById(R.id.price);
+            notShoppingViewModel.setNextPrice(new BigDecimal(price.getText().toString().substring(1)));
 
-                ItemQuantityDialogFragment dialog = new ItemQuantityDialogFragment();
-                dialog.show(getParentFragmentManager(), "ItemQuantityDialogFragment");
+            NotShoppingQuantityDialogFragment dialog = new NotShoppingQuantityDialogFragment();
+            dialog.show(getParentFragmentManager(), "NotShoppingQuantityDialogFragment");
         };
         adapter = new SearchItemAdapter(getActivity().getApplicationContext(), item_list, add_item);
         recycler.setAdapter(adapter);
@@ -93,7 +95,7 @@ public class ItemSearchFragment extends Fragment {
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
-            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_search_to_navigation_shopping);
+            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_not_shopping_search_to_navigation_not_shopping);
         }
         return super.onOptionsItemSelected(item);
     }

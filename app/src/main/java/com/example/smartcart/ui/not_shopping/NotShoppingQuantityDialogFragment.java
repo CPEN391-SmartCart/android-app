@@ -1,4 +1,4 @@
-package com.example.smartcart.ui.search;
+package com.example.smartcart.ui.not_shopping;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -18,16 +18,16 @@ import com.example.smartcart.ui.shopping.ShoppingViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
-public class ItemQuantityDialogFragment extends DialogFragment {
+public class NotShoppingQuantityDialogFragment extends DialogFragment {
 
 
-    private ShoppingViewModel shoppingViewModel;
+    private NotShoppingViewModel notShoppingViewModel;
     private NumberPicker aNumberPicker;
 
     @NotNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        shoppingViewModel = new ViewModelProvider(requireActivity()).get(ShoppingViewModel.class);
+        notShoppingViewModel = new ViewModelProvider(requireActivity()).get(NotShoppingViewModel.class);
 
         RelativeLayout linearLayout = new RelativeLayout(requireActivity());
         aNumberPicker = new NumberPicker(requireActivity());
@@ -50,8 +50,8 @@ public class ItemQuantityDialogFragment extends DialogFragment {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog,
                                                 int id) {
-                                shoppingViewModel.addShoppingListItem(new ShoppingListItem(aNumberPicker.getValue(), shoppingViewModel.getNextItemName(), shoppingViewModel.getNextPrice()));
-                                Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_search_to_navigation_shopping);
+                                notShoppingViewModel.addShoppingListItem(new ShoppingListItem(aNumberPicker.getValue(), notShoppingViewModel.getNextItemName(), notShoppingViewModel.getNextPrice()));
+                                Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_not_shopping_search_to_navigation_not_shopping);
                             }
                         })
                 .setNegativeButton("Cancel",

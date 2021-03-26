@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.smartcart.R;
-import com.example.smartcart.ui.search.ItemSearchFragment;
 
 import java.math.BigDecimal;
 
@@ -94,7 +93,7 @@ public class ShoppingFragment extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.add_item_button) {
-            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_shopping_to_navigation_search);
+            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_shopping_to_navigation_shopping_search);
         }
         return super.onOptionsItemSelected(item);
     }

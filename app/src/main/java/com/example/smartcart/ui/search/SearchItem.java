@@ -2,7 +2,7 @@ package com.example.smartcart.ui.search;
 
 import java.math.BigDecimal;
 
-class SearchItem {
+public class SearchItem {
     private String itemName;
     private BigDecimal price;
 

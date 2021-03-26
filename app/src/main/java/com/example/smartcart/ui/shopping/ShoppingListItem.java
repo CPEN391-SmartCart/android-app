@@ -8,6 +8,7 @@ import java.math.BigDecimal;
  */
 public class ShoppingListItem {
     private Integer quantity;
+    private String barcode;
     private final String itemName;
     private final BigDecimal price;
     private BigDecimal totalPrice;
@@ -37,7 +38,7 @@ public class ShoppingListItem {
         this.totalPrice = this.price.multiply(new BigDecimal(quantity));
         this.totalPrice = this.totalPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
     }
-
+    public String getBarcode() {return barcode; }
     public String getItemName() {
         return itemName;
     }

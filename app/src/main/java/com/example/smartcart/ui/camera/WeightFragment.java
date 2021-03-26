@@ -27,12 +27,12 @@ public class WeightFragment extends Fragment {
         shoppingViewModel =
                 new ViewModelProvider(requireActivity()).get(ShoppingViewModel.class);
         // Get the Intent that started this activity and extract the string
-        //ViewModel
-        String message = "apple";
+        String itemName = getArguments().getString("barcodeData");
 
         // Capture the layout's TextView and set the string as its text
+        // TODO:differentiate weight vs quantity priced items
         TextView itemNameView = root.findViewById(R.id.weight_item_name_text);
-        itemNameView.setText(message);
+        itemNameView.setText(itemName);
         TextView itemWeightView = root.findViewById(R.id.weight_text);
         double weight = getCurrentWeight();
         itemWeightView.setText(String.format( "%.2f", weight) + " lb");
@@ -46,9 +46,9 @@ public class WeightFragment extends Fragment {
         View weightAddCartButton = root.findViewById(R.id.weight_add_cart_button);
         weightAddCartButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Toast.makeText(requireActivity(), "Added " + message + " costing " + costString, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireActivity(), "Added " + itemName + " costing " + costString, Toast.LENGTH_SHORT).show();
                 // TODO: perform look up to get price
-                shoppingViewModel.addShoppingListItem(new ShoppingListItem(1, shoppingViewModel.getNextItemName(), 6.9));
+                shoppingViewModel.addShoppingListItem(new ShoppingListItem(1, itemName, 6.9));
                 Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_weight_to_navigation_camera);
             }
         });

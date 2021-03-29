@@ -1,6 +1,8 @@
 package com.example.smartcart.ui.shopping;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,7 +14,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.SharedElementCallback;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -24,6 +28,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.smartcart.R;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
+import cdflynn.android.library.checkview.CheckView;
 
 public class ShoppingFragment extends Fragment {
 
@@ -69,7 +78,34 @@ public class ShoppingFragment extends Fragment {
         // checkout
         Button checkout = (Button) root.findViewById(R.id.checkout);
         checkout.setOnClickListener(v -> {
-            //TODO: call payment api, make ui for it
+            ShoppingCheckoutDialogFragment dialog = new ShoppingCheckoutDialogFragment();
+            dialog.show(getParentFragmentManager(), "");
+        });
+
+        // update recycler view on value change
+        shoppingViewModel.getShoppingList().observe(getActivity(), new Observer<ArrayList<ShoppingListItem>>() {
+            @Override
+            public void onChanged(ArrayList<ShoppingListItem> shoppingListItems) {
+                adapter.refreshList(shoppingListItems);
+                adapter.notifyDataSetChanged();
+            }
+        });
+
+        shoppingViewModel.getHistory().observe(getActivity(), new Observer<ArrayList<ShoppingList>>() {
+            @Override
+            public void onChanged(ArrayList<ShoppingList> shoppingLists) {
+                if (!shoppingLists.isEmpty() && isResumed()) {
+                    CheckView checkAnimation = root.findViewById(R.id.check);
+                    checkAnimation.bringToFront();
+                    checkAnimation.check();
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        public void run() {
+                            checkAnimation.uncheck();
+                        }
+                    }, 1000);
+                }
+            }
         });
 
         adapter.notifyDataSetChanged();

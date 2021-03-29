@@ -17,6 +17,8 @@ public class ShoppingViewModel extends ViewModel {
     public  MutableLiveData<BigDecimal> total;
     private MutableLiveData<String> nextItemName;
     private MutableLiveData<BigDecimal> nextPrice;
+    private MutableLiveData<ArrayList<ShoppingList>> history;
+    private MutableLiveData<Boolean> sessionActive;
 
     public ShoppingViewModel() {
         shoppingList = new MutableLiveData<>();
@@ -29,8 +31,18 @@ public class ShoppingViewModel extends ViewModel {
         nextItemName.setValue("");
         nextPrice = new MutableLiveData<>();
         nextPrice.setValue(new BigDecimal("0.00"));
+
+        history = new MutableLiveData<>();
+        history.setValue(new ArrayList<>());
+
+        sessionActive = new MutableLiveData<>();
+        sessionActive.setValue(false);
         initShoppingList();
     }
+
+    public LiveData<Boolean> isSessionActive() { return this.sessionActive; }
+    public void startSession() { this.sessionActive.setValue(true); }
+    public void stopSession() { this.sessionActive.setValue(false); }
 
     public void setNextItemName(String nextItemName) {
         this.nextItemName.setValue(nextItemName);
@@ -40,6 +52,7 @@ public class ShoppingViewModel extends ViewModel {
     public BigDecimal getNextPrice() { return this.nextPrice.getValue(); }
 
     public LiveData<ArrayList<ShoppingListItem>> getShoppingList() { return shoppingList; }
+    public LiveData<ArrayList<ShoppingList>> getHistory() { return history; }
 
     public void addShoppingListItem(ShoppingListItem item) {
         ArrayList<ShoppingListItem> temp_list = new ArrayList<>(shoppingList.getValue());
@@ -69,10 +82,14 @@ public class ShoppingViewModel extends ViewModel {
             item.setQuantity(item.getQuantity() - 1);
         }
         total.setValue(total.getValue().subtract(item.getPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
-        shoppingList.setValue(temp_list);
+        shoppingList.setValue(new ArrayList<>(temp_list));
     }
 
-    public void clearShoppingList() {
+    public void clearShoppingListAndAddToHistory() {
+        ArrayList<ShoppingList> temp_history = new ArrayList<>(history.getValue());
+        temp_history.add(new ShoppingList(shoppingList.getValue(), total.getValue(), String.format("Shopping List #%s", temp_history.size())));
+        history.setValue(new ArrayList<>(temp_history));
+
         shoppingList.setValue(new ArrayList<>());
         itemNames = new HashSet<>();
         total.setValue(new BigDecimal("0.00"));

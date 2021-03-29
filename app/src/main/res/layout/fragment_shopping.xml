@@ -6,6 +6,20 @@
     android:layout_height="match_parent"
     tools:context="ui.shopping.ShoppingFragment">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+        <cdflynn.android.library.checkview.CheckView
+            android:id="@+id/check"
+            android:layout_marginTop="200dp"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            app:checkView_strokeColor="@color/green"
+            app:checkView_strokeWidth="@dimen/check_stroke_width" />
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler"
         android:layout_width="match_parent"

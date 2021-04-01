@@ -24,6 +24,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import com.example.smartcart.HomeActivity;
 import com.example.smartcart.R;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
@@ -153,6 +154,8 @@ public class CameraFragment extends Fragment {
     private void processNewBarcode()
     {
         Toast.makeText(getContext(), "Scanned barcode " + barcodeData, Toast.LENGTH_SHORT).show();
+
+        HomeActivity.btt.write("Scanned barcode " + barcodeData);
         previouslyScannedBarcodes.addLast(barcodeData);
         while(previouslyScannedBarcodes.size() > PREVIOUSLY_SCANNED_BARCODE_QUEUE_SIZE) {
             previouslyScannedBarcodes.poll();

@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.smartcart.ui.camera.WeightFragment;
 import com.example.smartcart.ui.shopping.ShoppingItemSearchFragment;
 import com.example.smartcart.ui.shopping.ShoppingFragment;
 import com.example.smartcart.ui.shopping.ShoppingViewModel;
@@ -35,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.cert.PKIXRevocationChecker;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -201,6 +203,11 @@ public class HomeActivity extends AppCompatActivity {
         // ... (Add other message types here as needed.)
     }
 
+    public interface DoubleUpdateHandler {
+        public void handleDoubleUpdate(double val);
+    }
+
+
     public class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
@@ -210,6 +217,7 @@ public class HomeActivity extends AppCompatActivity {
         private Optional<Double> lastLookupPrice;
         private Optional<Boolean> lastLookupByWeight;
         private double scaleWeightInGrams;
+        private ArrayList<DoubleUpdateHandler> weightUpdateHandlers;
 
         public class Item
         {
@@ -224,8 +232,16 @@ public class HomeActivity extends AppCompatActivity {
             public final boolean byWeight_;
         }
 
-        public void setScaleWeightInGrams(double grams){
+        public void addWeightChangedCallback(DoubleUpdateHandler handler){
+            weightUpdateHandlers.add(handler);
+        }
+
+        public void setScaleWeightInGrams(double grams)
+        {
             scaleWeightInGrams = grams;
+            for (DoubleUpdateHandler handler : weightUpdateHandlers){
+                handler.handleDoubleUpdate(grams);
+            }
         }
 
         public double getScaleWeightInGrams(){

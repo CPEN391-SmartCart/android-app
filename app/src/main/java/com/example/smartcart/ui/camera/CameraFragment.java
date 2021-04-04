@@ -165,10 +165,9 @@ public class CameraFragment extends Fragment {
             }
         }
         HomeActivity.ConnectedThread.Item item = HomeActivity.btt.getLastLookupItem().get();
-        HomeActivity.btt.write("ic:" + item.price_);
-        //TODO: add item to shopping cart
 
-        previouslyScannedBarcodes.addLast(barcodeData);
+        // add to camera view list
+        previouslyScannedBarcodes.addLast(item.name_);
         while(previouslyScannedBarcodes.size() > PREVIOUSLY_SCANNED_BARCODE_QUEUE_SIZE) {
             previouslyScannedBarcodes.poll();
         }
@@ -177,13 +176,18 @@ public class CameraFragment extends Fragment {
             previouslyScannedViews.get(i).setText(barcode);
             i++;
         }
-        if(barcodeData.toLowerCase().contains("apple")) {
+
+        if(item.byWeight_) {
             Bundle bundle = new Bundle();
-            bundle.putString("barcodeData", barcodeData);
+            bundle.putString("itemName", item.name_);
+            bundle.putDouble("itemPricePerGrams", item.price_);
             Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_camera_to_navigation_weight, bundle);
         }
         else {
-            Toast.makeText(getContext(), "Added " + barcodeData + " to your cart", Toast.LENGTH_SHORT).show();
+            HomeActivity.btt.write("ic:" + item.price_);
+            //TODO: add item to shopping cart
+            //shoppingViewModel.addShoppingListItem(new ShoppingListItem(1, itemName, cost));
+            Toast.makeText(getContext(), "Added " + item.name_ + " to your cart", Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.smartcart.HomeActivity;
 import com.example.smartcart.R;
 import com.example.smartcart.ui.shopping.ShoppingListItemAdapter;
 
@@ -59,7 +60,7 @@ public class NotShoppingFragment extends Fragment {
         //display shortest path
         Button displayPath = root.findViewById(R.id.displayPath);
         displayPath.setOnClickListener(v -> {
-            //TODO: bluetooth call de1 to show path on vga
+            HomeActivity.btt.write("sp:"+notShoppingViewModel.getNextItemName());
         });
         //Knapsack
         Button knapsack = root.findViewById(R.id.knapsack);

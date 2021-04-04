@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Path;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -33,6 +34,8 @@ import androidx.navigation.ui.NavigationUI;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.cert.PKIXRevocationChecker;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -158,6 +161,25 @@ public class HomeActivity extends AppCompatActivity {
                         String txt = (String)msg.obj;
                         Toast.makeText(getApplicationContext(), txt, Toast.LENGTH_SHORT).show();
                     }
+                    if(msg.what == MessageConstants.MESSAGE_READ){
+                        String txt = (String)msg.obj;
+                        if(txt.startsWith("in:")){
+                            btt.setLastLookupName(txt.substring(3));
+                        }
+                        else if(txt.startsWith("pw:"))
+                        {
+                            btt.setLastLookupPrice(((double)Integer.parseInt(txt.substring(3)))/100.0);
+                            btt.setLastLookupByWeight(true);
+                        }
+                        else if(txt.startsWith("pq:")){
+                            btt.setLastLookupPrice(((double)Integer.parseInt(txt.substring(3)))/100.0);
+                            btt.setLastLookupByWeight(false);
+                        }
+                        else if(txt.startsWith("sw:"))
+                        {
+                            btt.setScaleWeightInGrams(((double)Integer.parseInt(txt.substring(3)))/1000.0);
+                        }
+                    }
                 }
             };
 
@@ -184,6 +206,63 @@ public class HomeActivity extends AppCompatActivity {
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
         private byte[] mmBuffer; // mmBuffer store for the stream
+        private Optional<String> lastLookupName;
+        private Optional<Double> lastLookupPrice;
+        private Optional<Boolean> lastLookupByWeight;
+        private double scaleWeightInGrams;
+
+        public class Item
+        {
+            public Item(String name, double price, boolean byWeight){
+                name_ = name;
+                price_ = price;
+                byWeight_ = byWeight;
+            }
+
+            public final String name_;
+            public final double price_;
+            public final boolean byWeight_;
+        }
+
+        public void setScaleWeightInGrams(double grams){
+            scaleWeightInGrams = grams;
+        }
+
+        public double getScaleWeightInGrams(){
+            return scaleWeightInGrams;
+        }
+
+        public void setLastLookupName(String str)
+        {
+            lastLookupName = Optional.of(str);
+        }
+
+        public void setLastLookupPrice(double val)
+        {
+            lastLookupPrice = Optional.of(new Double(val));
+        }
+
+        public void setLastLookupByWeight(boolean val)
+        {
+            lastLookupByWeight = Optional.of(new Boolean(val));
+        }
+
+        public void clearLastLookupItem()
+        {
+            lastLookupName = Optional.empty();
+            lastLookupPrice = Optional.empty();
+            lastLookupByWeight = Optional.empty();
+        }
+
+        public Optional<Item> getLastLookupItem()
+        {
+            if(lastLookupByWeight.isPresent()&&lastLookupPrice.isPresent()&&lastLookupName.isPresent()) {
+                return Optional.of(new Item(lastLookupName.get(), lastLookupPrice.get(), lastLookupByWeight.get()));
+            }
+            else {
+                return Optional.empty();
+            }
+        }
 
         public ConnectedThread(BluetoothSocket socket) {
             mmSocket = socket;
@@ -230,26 +309,31 @@ public class HomeActivity extends AppCompatActivity {
 
         // Call this from the main activity to send data to the remote device.
         public void write(String str) {
-            try {
-                byte[]bytes = str.getBytes();
-                mmOutStream.write(bytes);
+            byte[] bytes;
+            while(str.length()>16) {
+                bytes = str.substring(0,16).getBytes();
+                str = str.substring(16);
 
-                // Share the sent message with the UI activity.
-                Message writtenMsg = mHandler.obtainMessage(
-                        MessageConstants.MESSAGE_WRITE, -1, -1, bytes);
-                writtenMsg.sendToTarget();
-            } catch (IOException e) {
-                Log.e(BT_TAG, "Error occurred when sending data", e);
+                try {
+                    mmOutStream.write(bytes);
 
-                // Send a failure message back to the activity.
-                Message writeErrorMsg =
-                        mHandler.obtainMessage(MessageConstants.MESSAGE_TOAST);
-                Bundle bundle = new Bundle();
-                bundle.putString("toast",
-                        "Couldn't send data to the other device");
+                    // Share the sent message with the UI activity.
+                    Message writtenMsg = mHandler.obtainMessage(
+                            MessageConstants.MESSAGE_WRITE, -1, -1, bytes);
+                    writtenMsg.sendToTarget();
+                } catch (IOException e) {
+                    Log.e(BT_TAG, "Error occurred when sending data", e);
 
-                writeErrorMsg.setData(bundle);
-                mHandler.sendMessage(writeErrorMsg);
+                    // Send a failure message back to the activity.
+                    Message writeErrorMsg =
+                            mHandler.obtainMessage(MessageConstants.MESSAGE_TOAST);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("toast",
+                            "Couldn't send data to the other device");
+
+                    writeErrorMsg.setData(bundle);
+                    mHandler.sendMessage(writeErrorMsg);
+                }
             }
         }
 

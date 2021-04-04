@@ -121,7 +121,6 @@ public class CameraFragment extends Fragment {
         barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
             @Override
             public void release() {
-                // Toast.makeText(getApplicationContext(), "To prevent memory leaks barcode scanner has been stopped", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -155,7 +154,20 @@ public class CameraFragment extends Fragment {
     {
         Toast.makeText(getContext(), "Scanned barcode " + barcodeData, Toast.LENGTH_SHORT).show();
 
-        HomeActivity.btt.write("Scanned barcode " + barcodeData);
+        HomeActivity.btt.clearLastLookupItem();
+        HomeActivity.btt.write("sc:" + barcodeData);
+        while(!HomeActivity.btt.getLastLookupItem().isPresent())
+        {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        HomeActivity.ConnectedThread.Item item = HomeActivity.btt.getLastLookupItem().get();
+        HomeActivity.btt.write("ic:" + item.price_);
+        //TODO: add item to shopping cart
+
         previouslyScannedBarcodes.addLast(barcodeData);
         while(previouslyScannedBarcodes.size() > PREVIOUSLY_SCANNED_BARCODE_QUEUE_SIZE) {
             previouslyScannedBarcodes.poll();

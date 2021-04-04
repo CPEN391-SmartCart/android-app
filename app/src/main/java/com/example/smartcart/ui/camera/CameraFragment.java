@@ -26,6 +26,8 @@ import androidx.navigation.Navigation;
 
 import com.example.smartcart.HomeActivity;
 import com.example.smartcart.R;
+import com.example.smartcart.ui.shopping.ShoppingListItem;
+import com.example.smartcart.ui.shopping.ShoppingViewModel;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
@@ -38,7 +40,7 @@ import java.util.LinkedList;
 
 public class CameraFragment extends Fragment {
 
-    private CameraViewModel cameraViewModel;
+    private ShoppingViewModel shoppingViewModel;
     private SurfaceView surfaceView;
     private BarcodeDetector barcodeDetector;
     private CameraSource cameraSource;
@@ -56,8 +58,8 @@ public class CameraFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        cameraViewModel =
-                new ViewModelProvider(this).get(CameraViewModel.class);
+        shoppingViewModel =
+                new ViewModelProvider(requireActivity()).get(ShoppingViewModel.class);
         View root = inflater.inflate(R.layout.fragment_camera, container, false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 
@@ -185,8 +187,7 @@ public class CameraFragment extends Fragment {
         }
         else {
             HomeActivity.btt.write("ic:" + item.price_);
-            //TODO: add item to shopping cart
-            //shoppingViewModel.addShoppingListItem(new ShoppingListItem(1, itemName, cost));
+            shoppingViewModel.addShoppingListItem(new ShoppingListItem(1, item.name_, item.price_));
             Toast.makeText(getContext(), "Added " + item.name_ + " to your cart", Toast.LENGTH_SHORT).show();
         }
     }

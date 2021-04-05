@@ -35,6 +35,7 @@ import androidx.navigation.ui.NavigationUI;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.PKIXRevocationChecker;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -165,7 +166,8 @@ public class HomeActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), txt, Toast.LENGTH_SHORT).show();
                     }
                     if(msg.what == MessageConstants.MESSAGE_READ){
-                        String txt = (String)msg.obj;
+                        String txt = new String((byte[])msg.obj, StandardCharsets.UTF_8);
+                        Toast.makeText(getApplicationContext(), "BTReceived: "+ txt, Toast.LENGTH_SHORT).show();
                         if(txt.startsWith("in:")){
                             btt.setLastLookupName(txt.substring(3));
                         }
@@ -326,31 +328,26 @@ public class HomeActivity extends AppCompatActivity {
 
         // Call this from the main activity to send data to the remote device.
         public void write(String str) {
-            byte[] bytes;
-            while(str.length()>16) {
-                bytes = str.substring(0,16).getBytes();
-                str = str.substring(16);
+            try {
+                byte[]bytes = str.getBytes();
+                mmOutStream.write(bytes);
 
-                try {
-                    mmOutStream.write(bytes);
+                // Share the sent message with the UI activity.
+                Message writtenMsg = mHandler.obtainMessage(
+                        MessageConstants.MESSAGE_WRITE, -1, -1, bytes);
+                writtenMsg.sendToTarget();
+            } catch (IOException e) {
+                Log.e(BT_TAG, "Error occurred when sending data", e);
 
-                    // Share the sent message with the UI activity.
-                    Message writtenMsg = mHandler.obtainMessage(
-                            MessageConstants.MESSAGE_WRITE, -1, -1, bytes);
-                    writtenMsg.sendToTarget();
-                } catch (IOException e) {
-                    Log.e(BT_TAG, "Error occurred when sending data", e);
+                // Send a failure message back to the activity.
+                Message writeErrorMsg =
+                        mHandler.obtainMessage(MessageConstants.MESSAGE_TOAST);
+                Bundle bundle = new Bundle();
+                bundle.putString("toast",
+                        "Couldn't send data to the other device");
 
-                    // Send a failure message back to the activity.
-                    Message writeErrorMsg =
-                            mHandler.obtainMessage(MessageConstants.MESSAGE_TOAST);
-                    Bundle bundle = new Bundle();
-                    bundle.putString("toast",
-                            "Couldn't send data to the other device");
-
-                    writeErrorMsg.setData(bundle);
-                    mHandler.sendMessage(writeErrorMsg);
-                }
+                writeErrorMsg.setData(bundle);
+                mHandler.sendMessage(writeErrorMsg);
             }
         }
 

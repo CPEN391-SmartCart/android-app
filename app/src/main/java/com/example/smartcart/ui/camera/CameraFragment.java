@@ -158,13 +158,20 @@ public class CameraFragment extends Fragment {
 
         HomeActivity.btt.clearLastLookupItem();
         HomeActivity.btt.write("sc:" + barcodeData);
-        while(!HomeActivity.btt.getLastLookupItem().isPresent())
+        for (int i = 0; i<5000; i++)
         {
+            if(HomeActivity.btt.getLastLookupItem().isPresent()){
+                break;
+            }
             try {
                 Thread.sleep(1);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+        if(!HomeActivity.btt.getLastLookupItem().isPresent()){
+            Toast.makeText(getContext(), "Timeout: Could not communicate with SmartCart over Bluetooth! Try again later", Toast.LENGTH_SHORT).show();
+            return;
         }
         HomeActivity.ConnectedThread.Item item = HomeActivity.btt.getLastLookupItem().get();
 

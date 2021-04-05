@@ -115,5 +115,6 @@ public class ShoppingViewModel extends ViewModel {
         addShoppingListItem(new ShoppingListItem(1, "Cheese", 1.99));
         addShoppingListItem(new ShoppingListItem(1, "Mountain Dew", 3.99));
         addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
+        addShoppingListItem(new ShoppingListItem(6.9, "Fiji Apples", 1.29));
     }
 }

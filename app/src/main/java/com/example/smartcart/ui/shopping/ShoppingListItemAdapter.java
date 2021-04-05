@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.smartcart.R;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 public class ShoppingListItemAdapter extends RecyclerView.Adapter<ShoppingListItemAdapter.ShoppingListItemViewHolder>{
@@ -40,6 +42,11 @@ public class ShoppingListItemAdapter extends RecyclerView.Adapter<ShoppingListIt
     public void onBindViewHolder(ShoppingListItemViewHolder holder, int position) {
         holder.quantity.setText(String.format("%s", shoppingList.get(position).getQuantity().toString()));
         holder.itemName.setText(shoppingList.get(position).getItemName());
+        if(shoppingList.get(position).getWeightString().equals("")) {
+            holder.weight.setText("");
+        } else {
+            holder.weight.setText(String.format("%skg", shoppingList.get(position).getWeightString()));
+        }
         holder.price.setText(String.format("$%s", shoppingList.get(position).getTotalPrice().toString()));
     }
 
@@ -52,6 +59,7 @@ public class ShoppingListItemAdapter extends RecyclerView.Adapter<ShoppingListIt
 
         private TextView quantity;
         private TextView itemName;
+        private TextView weight;
         private TextView price;
         private ImageButton remove;
 
@@ -59,6 +67,7 @@ public class ShoppingListItemAdapter extends RecyclerView.Adapter<ShoppingListIt
             super(itemView);
             quantity = (TextView) itemView.findViewById(R.id.quantity);
             itemName = (TextView) itemView.findViewById(R.id.itemName);
+            weight = (TextView) itemView.findViewById(R.id.weight);
             price = (TextView) itemView.findViewById(R.id.price);
             remove = (ImageButton) itemView.findViewById(R.id.remove);
             remove.setOnClickListener(remove_item);

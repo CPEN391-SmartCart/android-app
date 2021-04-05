@@ -57,7 +57,7 @@ public class WeightFragment extends Fragment {
             String costString = "$"+String.format(Locale.CANADA, "%.2f",cost);
             Toast.makeText(requireActivity(), "Added " + itemName + " costing " + costString, Toast.LENGTH_SHORT).show();
             double cost = HomeActivity.btt.getScaleWeightInGrams()*itemWeightPrice;
-            shoppingViewModel.addShoppingListItem(new ShoppingListItem(1, itemName, cost));
+            shoppingViewModel.addShoppingListItem(new ShoppingListItem(HomeActivity.btt.getScaleWeightInGrams() / 1000, itemName, cost));
             HomeActivity.btt.write("ic:" + cost);
             Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_weight_to_navigation_camera);
         });

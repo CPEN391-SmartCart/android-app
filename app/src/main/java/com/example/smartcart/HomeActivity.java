@@ -3,9 +3,7 @@ package com.example.smartcart;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Path;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -16,34 +14,32 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.smartcart.ui.camera.WeightFragment;
-import com.example.smartcart.ui.shopping.ShoppingItemSearchFragment;
-import com.example.smartcart.ui.shopping.ShoppingFragment;
-import com.example.smartcart.ui.shopping.ShoppingViewModel;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.example.smartcart.ui.shopping.ShoppingFragment;
+import com.example.smartcart.ui.shopping.ShoppingItemSearchFragment;
+import com.example.smartcart.ui.shopping.ShoppingViewModel;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.security.cert.PKIXRevocationChecker;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 public class HomeActivity extends AppCompatActivity {
-    public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
     private static final String BT_TAG = "MY_APP_DEBUG_TAG";
     private static final int REQUEST_ENABLE_BT = 1;
     public static ConnectedThread btt = null;
@@ -68,17 +64,14 @@ public class HomeActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
-        navView.getMenu().findItem(R.id.navigation_shopping).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                if (!shoppingViewModel.isSessionActive().getValue()) {
-                    showErrorDialog();
-                } else {
-                    navController.navigate(R.id.navigation_shopping);
-                }
-
-                return true;
+        navView.getMenu().findItem(R.id.navigation_shopping).setOnMenuItemClickListener(item -> {
+            if (!shoppingViewModel.isSessionActive().getValue()) {
+                showErrorDialog();
+            } else {
+                navController.navigate(R.id.navigation_shopping);
             }
+
+            return true;
         });
         initializeBluetooth();
     }
@@ -143,7 +136,7 @@ public class HomeActivity extends AppCompatActivity {
         if(bluetoothAdapter.isEnabled()){
 
             //attempt to connect to bluetooth module
-            BluetoothSocket tmp = null;
+            BluetoothSocket tmp;
             mmDevice = bluetoothAdapter.getRemoteDevice(MODULE_MAC);
 
             //create socket
@@ -159,7 +152,7 @@ public class HomeActivity extends AppCompatActivity {
             Log.i("[BLUETOOTH]", "Creating handler");
             mHandler = new Handler(Looper.getMainLooper()){
                 @Override
-                public void handleMessage(Message msg) {
+                public void handleMessage(@NotNull Message msg) {
                     //super.handleMessage(msg);
                     if(msg.what == MessageConstants.MESSAGE_TOAST){
                         String txt = (String)msg.obj;
@@ -167,22 +160,24 @@ public class HomeActivity extends AppCompatActivity {
                     }
                     if(msg.what == MessageConstants.MESSAGE_READ){
                         String txt = new String((byte[])msg.obj, StandardCharsets.UTF_8);
-                        Toast.makeText(getApplicationContext(), "BTReceived: "+ txt, Toast.LENGTH_SHORT).show();
-                        if(txt.startsWith("in:")){
-                            btt.setLastLookupName(txt.substring(3));
+                        //Toast.makeText(getApplicationContext(), "BTReceived: "+ txt, Toast.LENGTH_SHORT).show();
+                        handleReadMessage(txt);
+                        String fullMsg = btt.getLastIncompleteReadMessage()+txt;
+                        if(!fullMsg.contains("\n")) {
+                            btt.setLastIncompleteReadMessage(fullMsg);
                         }
-                        else if(txt.startsWith("pw:"))
-                        {
-                            btt.setLastLookupPrice(((double)Integer.parseInt(txt.substring(3)))/100.0);
-                            btt.setLastLookupByWeight(true);
-                        }
-                        else if(txt.startsWith("pq:")){
-                            btt.setLastLookupPrice(((double)Integer.parseInt(txt.substring(3)))/100.0);
-                            btt.setLastLookupByWeight(false);
-                        }
-                        else if(txt.startsWith("sw:"))
-                        {
-                            btt.setScaleWeightInGrams(((double)Integer.parseInt(txt.substring(3)))/1000.0);
+                        else{
+                            String[] splitReadMsgs = fullMsg.split("\n");
+                            for (int i = 0; i<splitReadMsgs.length - 1; i++) {
+                                handleReadMessage(splitReadMsgs[i]);
+                            }
+                            if(fullMsg.endsWith("\n")){
+                                handleReadMessage(splitReadMsgs[splitReadMsgs.length-1]);
+                                btt.setLastIncompleteReadMessage("");
+                            }
+                            else{
+                                btt.setLastIncompleteReadMessage(splitReadMsgs[splitReadMsgs.length-1]);
+                            }
                         }
                     }
                 }
@@ -191,36 +186,62 @@ public class HomeActivity extends AppCompatActivity {
             Log.i("[BLUETOOTH]", "Creating and running Thread");
             btt = new ConnectedThread(mmSocket);
             btt.start();
+        }
+    }
 
-
+    public static void handleReadMessage(String msg) {
+        if(msg.length()<=3) {
+            return;
+        }
+        if (msg.startsWith("in:")) {
+            btt.setLastLookupName(msg.substring(3));
+        } else {
+            int integerMessage = 0;
+            try {
+                integerMessage = Integer.parseInt(msg.substring(3).trim());
+            } catch (NumberFormatException e) {
+                Log.e(BT_TAG, "Error parsing int", e);
+            }
+            if (msg.startsWith("pw:")) {
+                btt.setLastLookupPrice(((double) integerMessage) / 100.0);
+                btt.setLastLookupByWeight(true);
+            } else if (msg.startsWith("pq:")) {
+                btt.setLastLookupPrice(((double) integerMessage) / 100.0);
+                btt.setLastLookupByWeight(false);
+            } else if (msg.startsWith("sw:")) {
+                btt.setScaleWeightInGrams(((double) integerMessage) / 1000.0);
+            }
         }
     }
 
     // Defines several constants used when transmitting messages between the
     // service and the UI.
     private interface MessageConstants {
-        public static final int MESSAGE_READ = 0;
-        public static final int MESSAGE_WRITE = 1;
-        public static final int MESSAGE_TOAST = 2;
-
+        int MESSAGE_READ = 0;
+        int MESSAGE_WRITE = 1;
+        int MESSAGE_TOAST = 2;
         // ... (Add other message types here as needed.)
     }
 
     public interface DoubleUpdateHandler {
-        public void handleDoubleUpdate(double val);
+        void handleDoubleUpdate(double val);
     }
 
+    public interface ItemUpdateHandler {
+        void handleItemUpdate(ConnectedThread.Item item);
+    }
 
     public class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
-        private byte[] mmBuffer; // mmBuffer store for the stream
         private Optional<String> lastLookupName;
         private Optional<Double> lastLookupPrice;
         private Optional<Boolean> lastLookupByWeight;
         private double scaleWeightInGrams;
-        private ArrayList<DoubleUpdateHandler> weightUpdateHandlers;
+        final private ArrayList<DoubleUpdateHandler> weightUpdateHandlers = new ArrayList<>();
+        final private ArrayList<ItemUpdateHandler> itemUpdateHandlers = new ArrayList<>();
+        String lastIncompleteReadMessage = "";
 
         public class Item
         {
@@ -239,12 +260,33 @@ public class HomeActivity extends AppCompatActivity {
             weightUpdateHandlers.add(handler);
         }
 
+        public void addItemChangedCallback(ItemUpdateHandler handler){
+            itemUpdateHandlers.add(handler);
+        }
+
+        private void checkAndHandleItemUpdate(){
+            if(lastLookupByWeight.isPresent()&&lastLookupPrice.isPresent()&&lastLookupName.isPresent()) {
+                Item item = new Item(lastLookupName.get(), lastLookupPrice.get(), lastLookupByWeight.get());
+                for (ItemUpdateHandler handler : itemUpdateHandlers){
+                    handler.handleItemUpdate(item);
+                }
+            }
+        }
+
         public void setScaleWeightInGrams(double grams)
         {
             scaleWeightInGrams = grams;
             for (DoubleUpdateHandler handler : weightUpdateHandlers){
                 handler.handleDoubleUpdate(grams);
             }
+        }
+
+        public String getLastIncompleteReadMessage(){
+            return lastIncompleteReadMessage;
+        }
+
+        public void setLastIncompleteReadMessage(String msg){
+            lastIncompleteReadMessage = msg;
         }
 
         public double getScaleWeightInGrams(){
@@ -254,16 +296,19 @@ public class HomeActivity extends AppCompatActivity {
         public void setLastLookupName(String str)
         {
             lastLookupName = Optional.of(str);
+            checkAndHandleItemUpdate();
         }
 
         public void setLastLookupPrice(double val)
         {
-            lastLookupPrice = Optional.of(new Double(val));
+            lastLookupPrice = Optional.of(val);
+            checkAndHandleItemUpdate();
         }
 
         public void setLastLookupByWeight(boolean val)
         {
-            lastLookupByWeight = Optional.of(new Boolean(val));
+            lastLookupByWeight = Optional.of(val);
+            checkAndHandleItemUpdate();
         }
 
         public void clearLastLookupItem()
@@ -306,7 +351,8 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         public void run() {
-            mmBuffer = new byte[1024];
+            // mmBuffer store for the stream
+            byte[] mmBuffer = new byte[1024];
             int numBytes; // bytes returned from read()
 
             // Keep listening to the InputStream until an exception occurs.

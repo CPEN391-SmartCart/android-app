@@ -20,6 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -37,6 +38,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Locale;
 
 public class CameraFragment extends Fragment {
 
@@ -75,6 +77,32 @@ public class CameraFragment extends Fragment {
         previouslyScannedBarcodes = new LinkedList<String>() ;
         barcodeData = "";
         initialiseDetectorsAndSources();
+
+        HomeActivity.btt.addItemChangedCallback(item -> {
+            // add to camera view list
+            previouslyScannedBarcodes.addLast(item.name_);
+            while(previouslyScannedBarcodes.size() > PREVIOUSLY_SCANNED_BARCODE_QUEUE_SIZE) {
+                previouslyScannedBarcodes.poll();
+            }
+            int i = 0;
+            for(String barcode : previouslyScannedBarcodes) {
+                previouslyScannedViews.get(i).setText(barcode);
+                i++;
+            }
+
+            if(item.byWeight_) {
+                Bundle bundle = new Bundle();
+                bundle.putString("itemName", item.name_);
+                bundle.putDouble("itemPricePerGrams", item.price_);
+                Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_camera_to_navigation_weight, bundle);
+            }
+            else {
+                HomeActivity.btt.write("ic:" + item.price_);
+                shoppingViewModel.addShoppingListItem(new ShoppingListItem(1, item.name_, item.price_));
+                Toast.makeText(getContext(), "Added " + item.name_ + " to your cart", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         return root;
     }
 
@@ -158,44 +186,8 @@ public class CameraFragment extends Fragment {
 
         HomeActivity.btt.clearLastLookupItem();
         HomeActivity.btt.write("sc:" + barcodeData);
-        for (int i = 0; i<5000; i++)
-        {
-            if(HomeActivity.btt.getLastLookupItem().isPresent()){
-                break;
-            }
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        if(!HomeActivity.btt.getLastLookupItem().isPresent()){
-            Toast.makeText(getContext(), "Timeout: Could not communicate with SmartCart over Bluetooth! Try again later", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        HomeActivity.ConnectedThread.Item item = HomeActivity.btt.getLastLookupItem().get();
 
-        // add to camera view list
-        previouslyScannedBarcodes.addLast(item.name_);
-        while(previouslyScannedBarcodes.size() > PREVIOUSLY_SCANNED_BARCODE_QUEUE_SIZE) {
-            previouslyScannedBarcodes.poll();
-        }
-        int i = 0;
-        for(String barcode : previouslyScannedBarcodes) {
-            previouslyScannedViews.get(i).setText(barcode);
-            i++;
-        }
-
-        if(item.byWeight_) {
-            Bundle bundle = new Bundle();
-            bundle.putString("itemName", item.name_);
-            bundle.putDouble("itemPricePerGrams", item.price_);
-            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_camera_to_navigation_weight, bundle);
-        }
-        else {
-            HomeActivity.btt.write("ic:" + item.price_);
-            shoppingViewModel.addShoppingListItem(new ShoppingListItem(1, item.name_, item.price_));
-            Toast.makeText(getContext(), "Added " + item.name_ + " to your cart", Toast.LENGTH_SHORT).show();
-        }
+        //HomeActivity.handleReadMessage("in:Apple");
+        //HomeActivity.handleReadMessage("pw:129");
     }
 }

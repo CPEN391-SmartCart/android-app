@@ -3,6 +3,7 @@ package com.example.smartcart;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,18 +34,31 @@ import com.android.volley.toolbox.Volley;
 import com.example.smartcart.ui.search.SearchItem;
 import com.example.smartcart.ui.shopping.ShoppingFragment;
 import com.example.smartcart.ui.shopping.ShoppingItemSearchFragment;
+import com.example.smartcart.ui.shopping.ShoppingList;
 import com.example.smartcart.ui.shopping.ShoppingViewModel;
+import com.example.smartcart.util.LocalDateConverter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Set;
@@ -61,11 +75,12 @@ public class HomeActivity extends AppCompatActivity {
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
     private final ArrayList<SearchItem> searchableItems = new ArrayList<>();
+    ShoppingViewModel shoppingViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ShoppingViewModel shoppingViewModel = new ViewModelProvider(this).get(ShoppingViewModel.class);
+        shoppingViewModel = new ViewModelProvider(this).get(ShoppingViewModel.class);
         setContentView(R.layout.activity_home);
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
@@ -99,6 +114,29 @@ public class HomeActivity extends AppCompatActivity {
         });
         initializeBluetooth();
         initializeSearchableItems();
+        initializeHistory();
+    }
+
+    private void initializeHistory() {
+        try (FileInputStream file = this.openFileInput("history.txt")) {
+            InputStreamReader input = new InputStreamReader(file, StandardCharsets.UTF_8);
+            StringBuilder stringBuilder = new StringBuilder();
+            BufferedReader reader = new BufferedReader(input);
+            String line = reader.readLine();
+            while (line != null) {
+                stringBuilder.append(line);
+                line = reader.readLine();
+            }
+            String content = stringBuilder.toString();
+            GsonBuilder builder = new GsonBuilder();
+            builder.registerTypeAdapter(new TypeToken<LocalDate>(){}.getType(), new LocalDateConverter());
+            Gson gson = builder.create();
+            Type type = new TypeToken<ArrayList<ShoppingList>>() {}.getType();
+            ArrayList<ShoppingList> history = gson.fromJson(content, type);
+            shoppingViewModel.setHistory(history);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initializeSearchableItems() {

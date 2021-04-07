@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.smartcart.ui.search.SearchItem;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -89,6 +90,10 @@ public class ShoppingViewModel extends ViewModel {
         shoppingList.setValue(new ArrayList<>());
         itemNames = new HashSet<>();
         total.setValue(new BigDecimal("0.00"));
+    }
+
+    public void setHistory(ArrayList<ShoppingList> shoppingList) {
+        history.setValue(shoppingList);
     }
 
     private void initShoppingList() {

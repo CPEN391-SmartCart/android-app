@@ -76,4 +76,7 @@ public class ShoppingListItem {
         }
         return weight.toString();
     }
+    public BigDecimal getWeight() {
+        return weight;
+    }
 }

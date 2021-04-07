@@ -17,6 +17,8 @@ public class ShoppingList {
         this.name = name;
     }
 
+    public ArrayList<ShoppingListItem> getItems() { return items; }
+
     public String getName() {
         return name;
     }

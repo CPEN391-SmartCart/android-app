@@ -1,12 +1,22 @@
 package com.example.smartcart.ui.shopping;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
+
+import com.example.smartcart.util.LocalDateConverter;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.time.LocalDate;
 
 public class ShoppingCheckoutDialogFragment extends DialogFragment {
 
@@ -23,6 +33,16 @@ public class ShoppingCheckoutDialogFragment extends DialogFragment {
                         if (true) { //replace with whether payment api returns true
                             shoppingViewModel.clearShoppingListAndAddToHistory();
                             shoppingViewModel.stopSession();
+
+                            try (FileOutputStream historyFile = getActivity().openFileOutput("history.txt", Context.MODE_PRIVATE)) {
+                                GsonBuilder builder = new GsonBuilder();
+                                builder.registerTypeAdapter(new TypeToken<LocalDate>(){}.getType(), new LocalDateConverter());
+                                Gson gson = builder.create();
+                                String jsonHistory = gson.toJson(shoppingViewModel.getHistory().getValue());
+                                historyFile.write(jsonHistory.getBytes());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         } else {
                             // display payment failed
                         }

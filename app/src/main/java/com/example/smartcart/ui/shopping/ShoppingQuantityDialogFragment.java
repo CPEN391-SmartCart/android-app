@@ -50,7 +50,7 @@ public class ShoppingQuantityDialogFragment extends DialogFragment {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog,
                                                 int id) {
-                                shoppingViewModel.addShoppingListItem(new ShoppingListItem(aNumberPicker.getValue(), shoppingViewModel.getNextItemName(), shoppingViewModel.getNextPrice()));
+                                shoppingViewModel.addShoppingListItem(new ShoppingListItem(aNumberPicker.getValue(), shoppingViewModel.getNextItem()));
                                 Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_shopping_search_to_navigation_shopping);
                             }
                         })

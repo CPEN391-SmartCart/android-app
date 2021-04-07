@@ -23,12 +23,23 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.smartcart.ui.search.SearchItem;
 import com.example.smartcart.ui.shopping.ShoppingFragment;
 import com.example.smartcart.ui.shopping.ShoppingItemSearchFragment;
 import com.example.smartcart.ui.shopping.ShoppingViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,6 +60,8 @@ public class HomeActivity extends AppCompatActivity {
     public final static String MODULE_MAC = "20:18:11:20:33:43";
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
+    private final ArrayList<SearchItem> searchableItems = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +77,7 @@ public class HomeActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
+        // Disable shopping and camera fragments while a session is not active
         navView.getMenu().findItem(R.id.navigation_shopping).setOnMenuItemClickListener(item -> {
             if (!shoppingViewModel.isSessionActive().getValue()) {
                 showErrorDialog();
@@ -73,7 +87,56 @@ public class HomeActivity extends AppCompatActivity {
 
             return true;
         });
+
+        navView.getMenu().findItem(R.id.navigation_camera).setOnMenuItemClickListener(item -> {
+            if (!shoppingViewModel.isSessionActive().getValue()) {
+                showErrorDialog();
+            } else {
+                navController.navigate(R.id.navigation_camera);
+            }
+
+            return true;
+        });
         initializeBluetooth();
+        initializeSearchableItems();
+    }
+
+    private void initializeSearchableItems() {
+        //call database to populate searchable items
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url ="https://cpen391-smartcart.herokuapp.com/items/search?keyword=";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray items = new JSONArray(response);
+                            for (int i = 0; i < items.length(); i++) {
+                                JSONObject item = items.getJSONObject(i);
+                                searchableItems.add(new SearchItem(item.getString("name"), item.getDouble("cost"), item.getString("barcode")));
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println(error);
+            }
+        });
+
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, 5, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest);
+    }
+
+    public ArrayList<SearchItem> getSearchableItems() {
+        return new ArrayList<>(this.searchableItems);
     }
 
     @Override

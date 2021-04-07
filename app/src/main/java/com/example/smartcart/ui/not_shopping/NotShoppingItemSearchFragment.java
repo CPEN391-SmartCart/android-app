@@ -7,6 +7,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -18,12 +19,22 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.smartcart.HomeActivity;
 import com.example.smartcart.R;
 import com.example.smartcart.ui.shopping.ShoppingQuantityDialogFragment;
 import com.example.smartcart.ui.search.SearchItem;
 import com.example.smartcart.ui.search.SearchItemAdapter;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -32,7 +43,7 @@ import java.util.Locale;
 public class NotShoppingItemSearchFragment extends Fragment {
 
     private NotShoppingViewModel notShoppingViewModel;
-    private final ArrayList<SearchItem> item_list = new ArrayList<>();
+    private ArrayList<SearchItem> item_list = new ArrayList<>();
     private SearchItemAdapter adapter;
 
     @Override
@@ -48,24 +59,21 @@ public class NotShoppingItemSearchFragment extends Fragment {
                 DividerItemDecoration.VERTICAL));
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recycler.setLayoutManager(layoutManager);
-        View.OnClickListener add_item = v -> {
-            TextView itemName = v.findViewById(R.id.itemName);
-            notShoppingViewModel.setNextItemName(itemName.getText().toString());
-            TextView price = v.findViewById(R.id.price);
-            notShoppingViewModel.setNextPrice(new BigDecimal(price.getText().toString().substring(1)));
+        View.OnClickListener add_item = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TextView itemName = v.findViewById(R.id.itemName);
+                TextView price = v.findViewById(R.id.price);
+                TextView barcode = v.findViewById(R.id.barcode);
+                notShoppingViewModel.setNextItem(new SearchItem(itemName.getText().toString(), new BigDecimal(price.getText().toString().substring(1)), barcode.getText().toString()));
 
-            NotShoppingQuantityDialogFragment dialog = new NotShoppingQuantityDialogFragment();
-            dialog.show(getParentFragmentManager(), "NotShoppingQuantityDialogFragment");
+                NotShoppingQuantityDialogFragment dialog = new NotShoppingQuantityDialogFragment();
+                dialog.show(getParentFragmentManager(), "NotShoppingQuantityDialogFragment");
+            }
         };
+        item_list = ((HomeActivity) getActivity()).getSearchableItems();
         adapter = new SearchItemAdapter(getActivity().getApplicationContext(), item_list, add_item);
         recycler.setAdapter(adapter);
-
-        //TODO: call database to populate searchable items
-        item_list.add(new SearchItem("ho", 1.00));
-        item_list.add(new SearchItem("eo", 2.7));
-        item_list.add(new SearchItem("3o", 3.0));
-        item_list.add(new SearchItem("no", 1.0));
-        item_list.add(new SearchItem("2o", 6.9));
 
         adapter.notifyDataSetChanged();
         return root;

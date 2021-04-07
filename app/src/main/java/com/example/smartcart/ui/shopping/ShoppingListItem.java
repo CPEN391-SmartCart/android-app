@@ -1,6 +1,7 @@
 package com.example.smartcart.ui.shopping;
 
 import java.math.BigDecimal;
+import com.example.smartcart.ui.search.SearchItem;
 
 /**
  * Represents an item in the shoppingList
@@ -40,6 +41,16 @@ public class ShoppingListItem {
         this.weight = new BigDecimal(weight).setScale(2, BigDecimal.ROUND_HALF_UP);
         this.totalPrice = this.price.multiply(this.weight);
         this.totalPrice = this.totalPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
+    }
+
+    public ShoppingListItem(int quantity, SearchItem searchitem) {
+        this.quantity = quantity;
+        this.itemName = searchitem.getName();
+        this.price = searchitem.getPrice().setScale(2, BigDecimal.ROUND_HALF_UP);
+        this.barcode = searchitem.getBarcode();
+        this.totalPrice = this.price.multiply(new BigDecimal(quantity));
+        this.totalPrice = this.totalPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
+        this.weight = new BigDecimal("0.0");
     }
 
     public Integer getQuantity() {

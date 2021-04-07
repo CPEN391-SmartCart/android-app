@@ -18,12 +18,25 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.smartcart.HomeActivity;
 import com.example.smartcart.R;
+import com.example.smartcart.ui.not_shopping.NotShoppingItemSearchFragment;
+import com.example.smartcart.ui.not_shopping.NotShoppingQuantityDialogFragment;
 import com.example.smartcart.ui.search.SearchItem;
 import com.example.smartcart.ui.search.SearchItemAdapter;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -31,7 +44,7 @@ import java.util.Locale;
 public class ShoppingItemSearchFragment extends Fragment {
 
     private ShoppingViewModel shoppingViewModel;
-    private final ArrayList<SearchItem> item_list = new ArrayList<>();
+    private ArrayList<SearchItem> item_list = new ArrayList<>();
     private SearchItemAdapter adapter;
 
     @Override
@@ -47,28 +60,27 @@ public class ShoppingItemSearchFragment extends Fragment {
                 DividerItemDecoration.VERTICAL));
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recycler.setLayoutManager(layoutManager);
-        View.OnClickListener add_item = v -> {
+        item_list = ((HomeActivity) getActivity()).getSearchableItems();
+        View.OnClickListener add_item = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 TextView itemName = v.findViewById(R.id.itemName);
-                shoppingViewModel.setNextItemName(itemName.getText().toString());
                 TextView price = v.findViewById(R.id.price);
-                shoppingViewModel.setNextPrice(new BigDecimal(price.getText().toString().substring(1)));
+                TextView barcode = v.findViewById(R.id.barcode);
+                shoppingViewModel.setNextItem(new SearchItem(itemName.getText().toString(), new BigDecimal(price.getText().toString().substring(1)), barcode.getText().toString()));
 
                 ShoppingQuantityDialogFragment dialog = new ShoppingQuantityDialogFragment();
                 dialog.show(getParentFragmentManager(), "ShoppingQuantityDialogFragment");
+            }
         };
         adapter = new SearchItemAdapter(getActivity().getApplicationContext(), item_list, add_item);
         recycler.setAdapter(adapter);
 
-        //TODO: call database to populate searchable items
-        item_list.add(new SearchItem("ho", 1.00));
-        item_list.add(new SearchItem("eo", 2.7));
-        item_list.add(new SearchItem("3o", 3.0));
-        item_list.add(new SearchItem("no", 1.0));
-        item_list.add(new SearchItem("2o", 6.9));
-
         adapter.notifyDataSetChanged();
         return root;
     }
+
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, @NotNull MenuInflater inflater) {

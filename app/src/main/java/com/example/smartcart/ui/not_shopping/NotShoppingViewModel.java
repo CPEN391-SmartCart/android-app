@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.smartcart.ui.search.SearchItem;
 import com.example.smartcart.ui.shopping.ShoppingListItem;
 
 import java.math.BigDecimal;
@@ -17,8 +18,7 @@ public class NotShoppingViewModel extends ViewModel {
     private MutableLiveData<ArrayList<ShoppingListItem>> shoppingList;
     private Set<String> itemNames;
     public  MutableLiveData<BigDecimal> total;
-    private MutableLiveData<String> nextItemName;
-    private MutableLiveData<BigDecimal> nextPrice;
+    private MutableLiveData<SearchItem> nextItem;
 
     public NotShoppingViewModel() {
         shoppingList = new MutableLiveData<>();
@@ -27,19 +27,14 @@ public class NotShoppingViewModel extends ViewModel {
         total = new MutableLiveData<>();
         total.setValue(new BigDecimal("0.00"));
 
-        nextItemName = new MutableLiveData<>();
-        nextItemName.setValue("");
-        nextPrice = new MutableLiveData<>();
-        nextPrice.setValue(new BigDecimal("0.00"));
+        nextItem = new MutableLiveData<>();
         initShoppingList();
     }
 
-    public void setNextItemName(String nextItemName) {
-        this.nextItemName.setValue(nextItemName);
+    public void setNextItem(SearchItem nextItem) {
+        this.nextItem.setValue(nextItem);
     }
-    public String getNextItemName() {return nextItemName.getValue(); }
-    public void setNextPrice(BigDecimal nextPrice) { this.nextPrice.setValue(nextPrice);}
-    public BigDecimal getNextPrice() { return this.nextPrice.getValue(); }
+    public SearchItem getNextItem() {return nextItem.getValue(); }
 
     public LiveData<ArrayList<ShoppingListItem>> getShoppingList() { return shoppingList; }
 

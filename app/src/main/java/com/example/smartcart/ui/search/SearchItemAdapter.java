@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.smartcart.R;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -51,7 +53,8 @@ public class SearchItemAdapter extends RecyclerView.Adapter<SearchItemAdapter.Se
     @Override
     public void onBindViewHolder(SearchItemViewHolder holder, int position) {
         holder.itemName.setText(filtered_item_list.get(position).getName());
-        holder.price.setText(filtered_item_list.get(position).getPrice());
+        holder.price.setText(String.format("$%s", filtered_item_list.get(position).getPrice()));
+        holder.barcode.setText(filtered_item_list.get(position).getBarcode());
     }
 
     @Override
@@ -63,12 +66,14 @@ public class SearchItemAdapter extends RecyclerView.Adapter<SearchItemAdapter.Se
 
         private TextView itemName;
         private TextView price;
+        private TextView barcode;
         private LinearLayout layout;
 
         public SearchItemViewHolder(View itemView) {
             super(itemView);
             itemName = (TextView) itemView.findViewById(R.id.itemName);
             price = (TextView) itemView.findViewById(R.id.price);
+            barcode = (TextView) itemView.findViewById(R.id.barcode);
             layout = (LinearLayout) itemView.findViewById(R.id.search_item_layout);
             layout.setOnClickListener(add_item);
         }

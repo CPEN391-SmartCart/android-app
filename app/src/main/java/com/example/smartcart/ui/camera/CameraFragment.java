@@ -1,6 +1,7 @@
 package com.example.smartcart.ui.camera;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
@@ -23,6 +24,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.example.smartcart.HomeActivity;
@@ -94,7 +96,11 @@ public class CameraFragment extends Fragment {
                 Bundle bundle = new Bundle();
                 bundle.putString("itemName", item.name_);
                 bundle.putDouble("itemPricePerGrams", item.price_);
-                Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_camera_to_navigation_weight, bundle);
+                Activity act = this.getActivity();
+                NavController navController = Navigation.findNavController(this.getActivity(), R.id.nav_host_fragment);
+                if (navController.getCurrentDestination().getId() == R.id.navigation_camera) {
+                    navController.navigate(R.id.action_navigation_camera_to_navigation_weight, bundle);
+                }
             }
             else {
                 HomeActivity.btt.write("ic:" + item.price_);

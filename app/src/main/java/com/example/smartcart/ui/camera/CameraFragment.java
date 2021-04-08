@@ -108,6 +108,7 @@ public class CameraFragment extends Fragment {
 
     private void initialiseDetectorsAndSources() {
 
+
         captureButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 processNewBarcode();
@@ -148,6 +149,7 @@ public class CameraFragment extends Fragment {
         });
 
 
+        // adapted from https://medium.com/analytics-vidhya/creating-a-barcode-scanner-using-android-studio-71cff11800a2
         barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
             @Override
             public void release() {

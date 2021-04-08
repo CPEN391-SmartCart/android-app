@@ -476,6 +476,7 @@ public class HomeActivity extends AppCompatActivity {
         // Call this from the main activity to send data to the remote device.
         public void write(String str) {
             try {
+                str += "\n";
                 byte[]bytes = str.getBytes();
                 mmOutStream.write(bytes);
 

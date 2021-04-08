@@ -1,19 +1,11 @@
 package com.example.smartcart;
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,38 +34,29 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import me.aflak.bluetooth.Bluetooth;
-import me.aflak.bluetooth.interfaces.BluetoothCallback;
 import me.aflak.bluetooth.interfaces.DeviceCallback;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HomeActivity extends AppCompatActivity {
     private static final String BT_TAG = "MY_APP_DEBUG_TAG";
     private static final int REQUEST_ENABLE_BT = 1;
-    public Handler mHandler;
-    BluetoothSocket mmSocket;
-    BluetoothDevice mmDevice;
     public final static String MODULE_MAC = "20:18:11:21:24:11";
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
@@ -81,6 +64,7 @@ public class HomeActivity extends AppCompatActivity {
     ShoppingViewModel shoppingViewModel;
 
     public static Bluetooth bluetooth;
+    public static Item item;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,7 +102,7 @@ public class HomeActivity extends AppCompatActivity {
             return true;
         });
         //initializeBluetooth();
-        initBluetoothTest();
+        initBluetooth();
         initializeSearchableItems();
         initializeHistory();
     }
@@ -164,7 +148,6 @@ public class HomeActivity extends AppCompatActivity {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -214,10 +197,11 @@ public class HomeActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void initBluetoothTest()
+    private void initBluetooth()
     {
         bluetooth = new Bluetooth(this);
         bluetooth.setDeviceCallback(deviceCallback);
+        item = new Item();
     }
 
     @Override
@@ -226,10 +210,10 @@ public class HomeActivity extends AppCompatActivity {
         bluetooth.onStart();
         if (bluetooth.isEnabled())
         {
-            Log.d("BT:", "ENABLED");
-            Log.d("BT:", bluetooth.getPairedDevices().toString());
-            bluetooth.connectToDevice(bluetooth.getPairedDevices().get(3));
-            Log.d("BT:", String.valueOf(bluetooth.isConnected()));
+            Log.d("BT", "ENABLED");
+            Log.d("BT", bluetooth.getPairedDevices().toString());
+            bluetooth.connectToDevice(bluetooth.getPairedDevices().get(7));
+            Log.d("BT", String.valueOf(bluetooth.isConnected()));
         }
         else
         {
@@ -246,50 +230,116 @@ public class HomeActivity extends AppCompatActivity {
     private DeviceCallback deviceCallback = new DeviceCallback() {
         @Override
         public void onDeviceConnected(BluetoothDevice device) {
-            Log.d("BT:", "CONNECTED " + device.getName());
+            Log.d("BT", "CONNECTED " + device.getName());
         }
 
         @Override
         public void onDeviceDisconnected(BluetoothDevice device, String message) {
-            Log.d("BT:", "DISCONNECTED " + device.getName() + " | " + message);
+            Log.d("BT", "DISCONNECTED " + device.getName() + " | " + message);
         }
 
         @Override
         public void onMessage(byte[] message) {
-            String test = new String(message);
-
+            String receivedMsg = new String(message);
+            handleReadMessage(receivedMsg);
         }
 
         @Override
         public void onError(int errorCode) {
-            Log.d("BT:", "OK!!O?");
+            Log.d("BT", "OK!!O?");
         }
 
         @Override
         public void onConnectError(BluetoothDevice device, String message) {
-            Log.d("BT:", message);
+            Log.d("BT", message);
         }
     };
 
-//    public static void handleReadMessage(String msg) {
-//        if (msg.startsWith("in:")) {
-//            btt.setLastLookupName(msg.substring(3));
-//        } else {
-//            int integerMessage = 0;
-//            try {
-//                integerMessage = Integer.parseInt(msg.substring(3).trim());
-//            } catch (NumberFormatException e) {
-//                Log.e(BT_TAG, "Error parsing int", e);
-//            }
-//            if (msg.startsWith("pw:")) {
-//                btt.setLastLookupPrice(((double) integerMessage) / 100.0);
-//                btt.setLastLookupByWeight(true);
-//            } else if (msg.startsWith("pq:")) {
-//                btt.setLastLookupPrice(((double) integerMessage) / 100.0);
-//                btt.setLastLookupByWeight(false);
-//            } else if (msg.startsWith("sw:")) {
-//                btt.setScaleWeightInGrams(((double) integerMessage) / 1000.0);
-//            }
-//        }
-//    }
+    public static void handleReadMessage(String msg) {
+        String command = "";
+        String field = "";
+        Pattern pattern = Pattern.compile("(\\w+):(.*)");
+
+        String[] payload = msg.split("\\|", 5);
+
+        for(int i = 0; i < payload.length; i++){
+            String test = payload[i];
+            Matcher matcher = pattern.matcher(payload[i]);
+
+            while (matcher.find()) {
+                command =  matcher.group(1);
+                field = matcher.group(2);
+            }
+
+            switch (command){
+                case "in": //item
+                    item.setName(field);
+                    break;
+
+                case "pw": //price by weight
+                    item.setByWeight(true);
+                    item.setPrice(Double.parseDouble(field.substring(1)));
+                    bluetooth.send("ic");
+                    break;
+
+                case "pq": //price without weight
+                    item.setByWeight(false);
+                    item.setPrice(Double.parseDouble(field.substring(1)));
+                    bluetooth.send("ic");
+                    break;
+
+                case "sw": //set scale weight
+                    item.setWeight(Double.parseDouble(field));
+                    break;
+
+                default:
+                    break; //error case possibly
+            }
+        }
+    }
+
+    public static class Item
+    {
+        public String name;
+        public double price;
+        public boolean byWeight;
+        public double weight;
+
+        public void setName(String name)
+        {
+            this.name = name;
+        }
+
+        public void setPrice(double price)
+        {
+            this.price = price;
+        }
+
+        public void setByWeight(boolean byWeight)
+        {
+            this.byWeight = byWeight;
+        }
+
+        public void setWeight(double weight)
+        {
+            this.weight = weight;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+
+        public double getPrice() {
+            return this.price;
+        }
+
+        public boolean getByWeight() {
+            return this.byWeight;
+        }
+
+        public double getWeight()
+        {
+            return this.weight = weight;
+        }
+    }
 }

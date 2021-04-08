@@ -1,6 +1,7 @@
 package com.example.smartcart.ui.camera;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
@@ -23,6 +24,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.example.smartcart.HomeActivity;
@@ -78,6 +80,7 @@ public class CameraFragment extends Fragment {
         barcodeData = "";
         initialiseDetectorsAndSources();
 
+        /*
         HomeActivity.btt.addItemChangedCallback(item -> {
             // add to camera view list
             previouslyScannedBarcodes.addLast(item.name_);
@@ -94,7 +97,11 @@ public class CameraFragment extends Fragment {
                 Bundle bundle = new Bundle();
                 bundle.putString("itemName", item.name_);
                 bundle.putDouble("itemPricePerGrams", item.price_);
-                Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_camera_to_navigation_weight, bundle);
+                Activity act = this.getActivity();
+                NavController navController = Navigation.findNavController(this.getActivity(), R.id.nav_host_fragment);
+                if (navController.getCurrentDestination().getId() == R.id.navigation_camera) {
+                    navController.navigate(R.id.action_navigation_camera_to_navigation_weight, bundle);
+                }
             }
             else {
                 HomeActivity.btt.write("ic:" + item.price_);
@@ -102,11 +109,13 @@ public class CameraFragment extends Fragment {
                 Toast.makeText(getContext(), "Added " + item.name_ + " to your cart", Toast.LENGTH_SHORT).show();
             }
         });
+         */
 
         return root;
     }
 
     private void initialiseDetectorsAndSources() {
+
 
         captureButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -148,6 +157,7 @@ public class CameraFragment extends Fragment {
         });
 
 
+        // adapted from https://medium.com/analytics-vidhya/creating-a-barcode-scanner-using-android-studio-71cff11800a2
         barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
             @Override
             public void release() {
@@ -184,8 +194,9 @@ public class CameraFragment extends Fragment {
     {
         Toast.makeText(getContext(), "Scanned barcode " + barcodeData, Toast.LENGTH_SHORT).show();
 
-        HomeActivity.btt.clearLastLookupItem();
-        HomeActivity.btt.write("sc:" + barcodeData);
+        HomeActivity.bluetooth.send("sc:" + barcodeData);
+//        HomeActivity.btt.clearLastLookupItem();
+//        HomeActivity.btt.write("sc:" + barcodeData);
 
         //HomeActivity.handleReadMessage("in:Apple");
         //HomeActivity.handleReadMessage("pw:129");

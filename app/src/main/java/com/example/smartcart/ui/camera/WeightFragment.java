@@ -44,23 +44,23 @@ public class WeightFragment extends Fragment {
         itemNameView.setText(itemName);
         itemWeightPriceView.setText(String.format("%s/g", String.format(Locale.CANADA, "%.2f", itemWeightPrice)));
 
-        // set up call back for when weight changes
-        HomeActivity.btt.addWeightChangedCallback(val -> {
-            itemWeightView.setText(String.format(Locale.CANADA, "%.2f", val));
-            cost = HomeActivity.btt.getScaleWeightInGrams()*itemWeightPrice;
-            String costString = "$"+String.format(Locale.CANADA, "%.2f",val*itemWeightPrice);
-            itemCostView.setText(costString);
-        });
-
-        View weightAddCartButton = root.findViewById(R.id.weight_add_cart_button);
-        weightAddCartButton.setOnClickListener(v -> {
-            String costString = "$"+String.format(Locale.CANADA, "%.2f",cost);
-            Toast.makeText(requireActivity(), "Added " + itemName + " costing " + costString, Toast.LENGTH_SHORT).show();
-            double cost = HomeActivity.btt.getScaleWeightInGrams()*itemWeightPrice;
-            shoppingViewModel.addShoppingListItem(new ShoppingListItem(HomeActivity.btt.getScaleWeightInGrams() / 1000, itemName, cost));
-            HomeActivity.btt.write("ic:" + cost);
-            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_weight_to_navigation_camera);
-        });
+//        // set up call back for when weight changes
+//        HomeActivity.btt.addWeightChangedCallback(val -> {
+//            itemWeightView.setText(String.format(Locale.CANADA, "%.2f", val));
+//            cost = HomeActivity.btt.getScaleWeightInGrams()*itemWeightPrice;
+//            String costString = "$"+String.format(Locale.CANADA, "%.2f",val*itemWeightPrice);
+//            itemCostView.setText(costString);
+//        });
+//
+//        View weightAddCartButton = root.findViewById(R.id.weight_add_cart_button);
+//        weightAddCartButton.setOnClickListener(v -> {
+//            String costString = "$"+String.format(Locale.CANADA, "%.2f",cost);
+//            Toast.makeText(requireActivity(), "Added " + itemName + " costing " + costString, Toast.LENGTH_SHORT).show();
+//            double cost = HomeActivity.btt.getScaleWeightInGrams()*itemWeightPrice;
+//            shoppingViewModel.addShoppingListItem(new ShoppingListItem(HomeActivity.btt.getScaleWeightInGrams() / 1000, itemName, cost));
+//            HomeActivity.btt.write("ic:" + cost);
+//            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_weight_to_navigation_camera);
+//        });
 
         return root;
     }

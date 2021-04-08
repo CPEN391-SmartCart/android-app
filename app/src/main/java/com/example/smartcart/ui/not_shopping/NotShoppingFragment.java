@@ -59,9 +59,9 @@ public class NotShoppingFragment extends Fragment {
 
         //display shortest path
         Button displayPath = root.findViewById(R.id.displayPath);
-        displayPath.setOnClickListener(v -> {
-            HomeActivity.btt.write("pp:"+notShoppingViewModel.getNextItem());
-        });
+//        displayPath.setOnClickListener(v -> {
+//            HomeActivity.btt.write("pp:"+notShoppingViewModel.getNextItem());
+//        });
         //Knapsack
         Button knapsack = root.findViewById(R.id.knapsack);
         knapsack.setOnClickListener(v -> {

@@ -1,19 +1,11 @@
 package com.example.smartcart;
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -44,41 +36,38 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
+
+import me.aflak.bluetooth.Bluetooth;
+import me.aflak.bluetooth.interfaces.DeviceCallback;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HomeActivity extends AppCompatActivity {
     private static final String BT_TAG = "MY_APP_DEBUG_TAG";
     private static final int REQUEST_ENABLE_BT = 1;
-    public static ConnectedThread btt = null;
-    public Handler mHandler;
-    BluetoothSocket mmSocket;
-    BluetoothDevice mmDevice;
-    public final static String MODULE_MAC = "20:18:11:20:33:43";
+    public final static String MODULE_MAC = "20:18:11:21:24:11";
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
     private final ArrayList<SearchItem> searchableItems = new ArrayList<>();
     ShoppingViewModel shoppingViewModel;
     String googleId;
+
+    public static Bluetooth bluetooth;
+    public static Item item;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +105,8 @@ public class HomeActivity extends AppCompatActivity {
 
             return true;
         });
-        initializeBluetooth();
+        //initializeBluetooth();
+        initBluetooth();
         initializeSearchableItems();
         initializeReceipts();
     }
@@ -177,7 +167,6 @@ public class HomeActivity extends AppCompatActivity {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -227,309 +216,149 @@ public class HomeActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void initializeBluetooth()
+    private void initBluetooth()
     {
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter == null) {
-            // Device doesn't support Bluetooth
-            return;
-        }
-        if (!bluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        }
-        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        bluetooth = new Bluetooth(this);
+        bluetooth.setDeviceCallback(deviceCallback);
+        item = new Item();
+    }
 
-        if (pairedDevices.size() > 0) {
-            // There are paired devices. Get the name and address of each paired device.
-            for (BluetoothDevice device : pairedDevices) {
-                String deviceName = device.getName();
-                String deviceHardwareAddress = device.getAddress(); // MAC address
-                Toast.makeText(getApplicationContext(), deviceName + "  " + deviceHardwareAddress, Toast.LENGTH_SHORT).show();
-            }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        bluetooth.onStart();
+        if (bluetooth.isEnabled())
+        {
+            Log.d("BT", "ENABLED");
+            Log.d("BT", bluetooth.getPairedDevices().toString());
+            bluetooth.connectToDevice(bluetooth.getPairedDevices().get(7));
+            Log.d("BT", String.valueOf(bluetooth.isConnected()));
         }
         else
         {
-            Toast.makeText(getApplicationContext(), "No devices found!", Toast.LENGTH_SHORT).show();
-        }
-
-        if(bluetoothAdapter.isEnabled()){
-
-            //attempt to connect to bluetooth module
-            BluetoothSocket tmp;
-            mmDevice = bluetoothAdapter.getRemoteDevice(MODULE_MAC);
-
-            //create socket
-            try {
-                tmp = mmDevice.createRfcommSocketToServiceRecord(MY_UUID);
-                mmSocket = tmp;
-                mmSocket.connect();
-                Log.i("[BLUETOOTH]","Connected to: "+mmDevice.getName());
-            }catch(IOException e){
-                try{mmSocket.close();}catch(IOException c){return;}
-            }
-
-            Log.i("[BLUETOOTH]", "Creating handler");
-            mHandler = new Handler(Looper.getMainLooper()){
-                @Override
-                public void handleMessage(@NotNull Message msg) {
-                    //super.handleMessage(msg);
-                    if(msg.what == MessageConstants.MESSAGE_TOAST){
-                        String txt = (String)msg.obj;
-                        Toast.makeText(getApplicationContext(), txt, Toast.LENGTH_SHORT).show();
-                    }
-                    if(msg.what == MessageConstants.MESSAGE_READ){
-                        String txt = new String((byte[])msg.obj, StandardCharsets.UTF_8);
-                        //Toast.makeText(getApplicationContext(), "BTReceived: "+ txt, Toast.LENGTH_SHORT).show();
-                        handleReadMessage(txt);
-                        String fullMsg = btt.getLastIncompleteReadMessage()+txt;
-                        if(!fullMsg.contains("\n")) {
-                            btt.setLastIncompleteReadMessage(fullMsg);
-                        }
-                        else{
-                            String[] splitReadMsgs = fullMsg.split("\n");
-                            for (int i = 0; i<splitReadMsgs.length - 1; i++) {
-                                handleReadMessage(splitReadMsgs[i]);
-                            }
-                            if(fullMsg.endsWith("\n")){
-                                handleReadMessage(splitReadMsgs[splitReadMsgs.length-1]);
-                                btt.setLastIncompleteReadMessage("");
-                            }
-                            else{
-                                btt.setLastIncompleteReadMessage(splitReadMsgs[splitReadMsgs.length-1]);
-                            }
-                        }
-                    }
-                }
-            };
-
-            Log.i("[BLUETOOTH]", "Creating and running Thread");
-            btt = new ConnectedThread(mmSocket);
-            btt.start();
+            bluetooth.enable();
         }
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        super.onActivityResult(requestCode, resultCode, data);
+    protected void onStop() {
+        super.onStop();
+        bluetooth.onStop();
     }
+
+    private DeviceCallback deviceCallback = new DeviceCallback() {
+        @Override
+        public void onDeviceConnected(BluetoothDevice device) {
+            Log.d("BT", "CONNECTED " + device.getName());
+        }
+
+        @Override
+        public void onDeviceDisconnected(BluetoothDevice device, String message) {
+            Log.d("BT", "DISCONNECTED " + device.getName() + " | " + message);
+        }
+
+        @Override
+        public void onMessage(byte[] message) {
+            String receivedMsg = new String(message);
+            handleReadMessage(receivedMsg);
+        }
+
+        @Override
+        public void onError(int errorCode) {
+            Log.d("BT", "OK!!O?");
+        }
+
+        @Override
+        public void onConnectError(BluetoothDevice device, String message) {
+            Log.d("BT", message);
+        }
+    };
 
     public static void handleReadMessage(String msg) {
-        if(msg.length()<=3) {
-            return;
-        }
-        if (msg.startsWith("in:")) {
-            btt.setLastLookupName(msg.substring(3));
-        } else {
-            int integerMessage = 0;
-            try {
-                integerMessage = Integer.parseInt(msg.substring(3).trim());
-            } catch (NumberFormatException e) {
-                Log.e(BT_TAG, "Error parsing int", e);
-            }
-            if (msg.startsWith("pw:")) {
-                btt.setLastLookupPrice(((double) integerMessage) / 100.0);
-                btt.setLastLookupByWeight(true);
-            } else if (msg.startsWith("pq:")) {
-                btt.setLastLookupPrice(((double) integerMessage) / 100.0);
-                btt.setLastLookupByWeight(false);
-            } else if (msg.startsWith("sw:")) {
-                btt.setScaleWeightInGrams(((double) integerMessage) / 1000.0);
-            }
-        }
-    }
+        String command = "";
+        String field = "";
+        Pattern pattern = Pattern.compile("(\\w+):(.*)");
 
-    // Defines several constants used when transmitting messages between the
-    // service and the UI.
-    private interface MessageConstants {
-        int MESSAGE_READ = 0;
-        int MESSAGE_WRITE = 1;
-        int MESSAGE_TOAST = 2;
-        // ... (Add other message types here as needed.)
-    }
+        String[] payload = msg.split("\\|", 5);
 
-    public interface DoubleUpdateHandler {
-        void handleDoubleUpdate(double val);
-    }
+        for(int i = 0; i < payload.length; i++){
+            String test = payload[i];
+            Matcher matcher = pattern.matcher(payload[i]);
 
-    public interface ItemUpdateHandler {
-        void handleItemUpdate(ConnectedThread.Item item);
-    }
-
-    public class ConnectedThread extends Thread {
-        private final BluetoothSocket mmSocket;
-        private final InputStream mmInStream;
-        private final OutputStream mmOutStream;
-        private Optional<String> lastLookupName;
-        private Optional<Double> lastLookupPrice;
-        private Optional<Boolean> lastLookupByWeight;
-        private double scaleWeightInGrams;
-        final private ArrayList<DoubleUpdateHandler> weightUpdateHandlers = new ArrayList<>();
-        final private ArrayList<ItemUpdateHandler> itemUpdateHandlers = new ArrayList<>();
-        String lastIncompleteReadMessage = "";
-
-        public class Item
-        {
-            public Item(String name, double price, boolean byWeight){
-                name_ = name;
-                price_ = price;
-                byWeight_ = byWeight;
+            while (matcher.find()) {
+                command =  matcher.group(1);
+                field = matcher.group(2);
             }
 
-            public final String name_;
-            public final double price_;
-            public final boolean byWeight_;
-        }
-
-        public void addWeightChangedCallback(DoubleUpdateHandler handler){
-            weightUpdateHandlers.add(handler);
-        }
-
-        public void addItemChangedCallback(ItemUpdateHandler handler){
-            itemUpdateHandlers.add(handler);
-        }
-
-        private void checkAndHandleItemUpdate(){
-            if(lastLookupByWeight.isPresent()&&lastLookupPrice.isPresent()&&lastLookupName.isPresent()) {
-                Item item = new Item(lastLookupName.get(), lastLookupPrice.get(), lastLookupByWeight.get());
-                for (ItemUpdateHandler handler : itemUpdateHandlers){
-                    handler.handleItemUpdate(item);
-                }
-            }
-        }
-
-        public void setScaleWeightInGrams(double grams)
-        {
-            scaleWeightInGrams = grams;
-            for (DoubleUpdateHandler handler : weightUpdateHandlers){
-                handler.handleDoubleUpdate(grams);
-            }
-        }
-
-        public String getLastIncompleteReadMessage(){
-            return lastIncompleteReadMessage;
-        }
-
-        public void setLastIncompleteReadMessage(String msg){
-            lastIncompleteReadMessage = msg;
-        }
-
-        public double getScaleWeightInGrams(){
-            return scaleWeightInGrams;
-        }
-
-        public void setLastLookupName(String str)
-        {
-            lastLookupName = Optional.of(str);
-            checkAndHandleItemUpdate();
-        }
-
-        public void setLastLookupPrice(double val)
-        {
-            lastLookupPrice = Optional.of(val);
-            checkAndHandleItemUpdate();
-        }
-
-        public void setLastLookupByWeight(boolean val)
-        {
-            lastLookupByWeight = Optional.of(val);
-            checkAndHandleItemUpdate();
-        }
-
-        public void clearLastLookupItem()
-        {
-            lastLookupName = Optional.empty();
-            lastLookupPrice = Optional.empty();
-            lastLookupByWeight = Optional.empty();
-        }
-
-        public Optional<Item> getLastLookupItem()
-        {
-            if(lastLookupByWeight.isPresent()&&lastLookupPrice.isPresent()&&lastLookupName.isPresent()) {
-                return Optional.of(new Item(lastLookupName.get(), lastLookupPrice.get(), lastLookupByWeight.get()));
-            }
-            else {
-                return Optional.empty();
-            }
-        }
-
-        public ConnectedThread(BluetoothSocket socket) {
-            mmSocket = socket;
-            InputStream tmpIn = null;
-            OutputStream tmpOut = null;
-
-            // Get the input and output streams; using temp objects because
-            // member streams are final.
-            try {
-                tmpIn = socket.getInputStream();
-            } catch (IOException e) {
-                Log.e(BT_TAG, "Error occurred when creating input stream", e);
-            }
-            try {
-                tmpOut = socket.getOutputStream();
-            } catch (IOException e) {
-                Log.e(BT_TAG, "Error occurred when creating output stream", e);
-            }
-
-            mmInStream = tmpIn;
-            mmOutStream = tmpOut;
-        }
-
-        public void run() {
-            // mmBuffer store for the stream
-            byte[] mmBuffer = new byte[1024];
-            int numBytes; // bytes returned from read()
-
-            // Keep listening to the InputStream until an exception occurs.
-            while (true) {
-                try {
-                    // Read from the InputStream.
-                    numBytes = mmInStream.read(mmBuffer);
-                    // Send the obtained bytes to the UI activity.
-                    Message readMsg = mHandler.obtainMessage(
-                            MessageConstants.MESSAGE_READ, numBytes, -1,
-                            mmBuffer);
-                    readMsg.sendToTarget();
-                } catch (IOException e) {
-                    Log.d(BT_TAG, "Input stream was disconnected", e);
+            switch (command){
+                case "in": //item
+                    item.setName(field);
                     break;
-                }
+
+                case "pw": //price by weight
+                    item.setByWeight(true);
+                    item.setPrice(Double.parseDouble(field.substring(1)));
+                    bluetooth.send("ic");
+                    break;
+
+                case "pq": //price without weight
+                    item.setByWeight(false);
+                    item.setPrice(Double.parseDouble(field.substring(1)));
+                    bluetooth.send("ic");
+                    break;
+
+                case "sw": //set scale weight
+                    item.setWeight(Double.parseDouble(field));
+                    break;
+
+                default:
+                    break; //error case possibly
             }
         }
+    }
 
-        // Call this from the main activity to send data to the remote device.
-        public void write(String str) {
-            try {
-                byte[]bytes = str.getBytes();
-                mmOutStream.write(bytes);
+    public static class Item
+    {
+        public String name;
+        public double price;
+        public boolean byWeight;
+        public double weight;
 
-                // Share the sent message with the UI activity.
-                Message writtenMsg = mHandler.obtainMessage(
-                        MessageConstants.MESSAGE_WRITE, -1, -1, bytes);
-                writtenMsg.sendToTarget();
-            } catch (IOException e) {
-                Log.e(BT_TAG, "Error occurred when sending data", e);
-
-                // Send a failure message back to the activity.
-                Message writeErrorMsg =
-                        mHandler.obtainMessage(MessageConstants.MESSAGE_TOAST);
-                Bundle bundle = new Bundle();
-                bundle.putString("toast",
-                        "Couldn't send data to the other device");
-
-                writeErrorMsg.setData(bundle);
-                mHandler.sendMessage(writeErrorMsg);
-            }
+        public void setName(String name)
+        {
+            this.name = name;
         }
 
-        // Call this method from the main activity to shut down the connection.
-        public void cancel() {
-            try {
-                mmSocket.close();
-            } catch (IOException e) {
-                Log.e(BT_TAG, "Could not close the connect socket", e);
-            }
+        public void setPrice(double price)
+        {
+            this.price = price;
+        }
+
+        public void setByWeight(boolean byWeight)
+        {
+            this.byWeight = byWeight;
+        }
+
+        public void setWeight(double weight)
+        {
+            this.weight = weight;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+
+        public double getPrice() {
+            return this.price;
+        }
+
+        public boolean getByWeight() {
+            return this.byWeight;
+        }
+
+        public double getWeight()
+        {
+            return this.weight = weight;
         }
     }
 }

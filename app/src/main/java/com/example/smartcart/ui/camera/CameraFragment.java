@@ -80,6 +80,7 @@ public class CameraFragment extends Fragment {
         barcodeData = "";
         initialiseDetectorsAndSources();
 
+        /*
         HomeActivity.btt.addItemChangedCallback(item -> {
             // add to camera view list
             previouslyScannedBarcodes.addLast(item.name_);
@@ -108,6 +109,7 @@ public class CameraFragment extends Fragment {
                 Toast.makeText(getContext(), "Added " + item.name_ + " to your cart", Toast.LENGTH_SHORT).show();
             }
         });
+         */
 
         return root;
     }
@@ -192,8 +194,9 @@ public class CameraFragment extends Fragment {
     {
         Toast.makeText(getContext(), "Scanned barcode " + barcodeData, Toast.LENGTH_SHORT).show();
 
-        HomeActivity.btt.clearLastLookupItem();
-        HomeActivity.btt.write("sc:" + barcodeData);
+        HomeActivity.bluetooth.send("sc:" + barcodeData);
+//        HomeActivity.btt.clearLastLookupItem();
+//        HomeActivity.btt.write("sc:" + barcodeData);
 
         //HomeActivity.handleReadMessage("in:Apple");
         //HomeActivity.handleReadMessage("pw:129");

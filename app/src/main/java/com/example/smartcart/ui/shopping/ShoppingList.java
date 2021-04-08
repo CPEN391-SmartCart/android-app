@@ -6,15 +6,27 @@ import java.time.LocalDate;
 
 public class ShoppingList {
     private ArrayList<ShoppingListItem> items;
+    private BigDecimal subtotal;
+    private BigDecimal gst;
     private BigDecimal totalPrice;
-    private LocalDate purchaseDate;
+    private String purchaseDate;
     private String name;
 
-    public ShoppingList(ArrayList<ShoppingListItem> shoppingListItems, BigDecimal totalPrice, String name) {
+    public ShoppingList(ArrayList<ShoppingListItem> shoppingListItems, BigDecimal subtotal, String name) {
         this.items = new ArrayList<>(shoppingListItems);
-        this.totalPrice = new BigDecimal(String.valueOf(totalPrice));
-        this.purchaseDate = LocalDate.now();
+        this.subtotal = new BigDecimal(String.valueOf(subtotal)).setScale(2, BigDecimal.ROUND_HALF_UP);
+        this.gst = this.subtotal.multiply(BigDecimal.valueOf(0.05)).setScale(2, BigDecimal.ROUND_HALF_UP);;
+        this.totalPrice = this.subtotal.add(gst);
+        this.purchaseDate = LocalDate.now().toString();
         this.name = name;
+    }
+
+    public ShoppingList(double subtotal, String purchaseDate) {
+        this.subtotal = new BigDecimal(String.valueOf(subtotal)).setScale(2, BigDecimal.ROUND_HALF_UP);
+        this.gst = this.subtotal.multiply(BigDecimal.valueOf(0.05)).setScale(2, BigDecimal.ROUND_HALF_UP);;
+        this.totalPrice = this.subtotal.add(gst);
+        this.purchaseDate = purchaseDate.substring(0, 10);
+        this.name = "ShoppingList";
     }
 
     public ArrayList<ShoppingListItem> getItems() { return items; }
@@ -22,12 +34,14 @@ public class ShoppingList {
     public String getName() {
         return name;
     }
+    public double getSubTotal() { return subtotal.doubleValue(); }
+    public double getGST() { return gst.doubleValue(); }
 
     public String getTotalPrice() {
         return totalPrice.toString();
     }
 
     public String getPurchaseDate() {
-        return purchaseDate.toString();
+        return purchaseDate;
     }
 }

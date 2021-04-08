@@ -29,7 +29,7 @@
     <fragment
         android:id="@+id/navigation_shopping"
         android:name="com.example.smartcart.ui.shopping.ShoppingFragment"
-        android:label="navigation_shopping"
+        android:label="@string/title_shopping"
         tools:layout="@layout/fragment_shopping" >
         <action
             android:id="@+id/action_navigation_shopping_to_navigation_shopping_search"
@@ -38,7 +38,7 @@
     <fragment
         android:id="@+id/navigation_not_shopping"
         android:name="com.example.smartcart.ui.not_shopping.NotShoppingFragment"
-        android:label="navigation_not_shopping"
+        android:label="@string/title_not_shopping"
         tools:layout="@layout/fragment_not_shopping" >
         <action
             android:id="@+id/action_navigation_not_shopping_to_navigation_not_shopping_search"
@@ -47,7 +47,7 @@
     <fragment
         android:id="@+id/navigation_camera"
         android:name="com.example.smartcart.ui.camera.CameraFragment"
-        android:label="navigation_camera"
+        android:label="@string/title_camera"
         tools:layout="@layout/fragment_camera" >
         <action
             android:id="@+id/action_navigation_camera_to_navigation_weight"
@@ -56,7 +56,7 @@
     <fragment
         android:id="@+id/navigation_shopping_search"
         android:name="com.example.smartcart.ui.shopping.ShoppingItemSearchFragment"
-        android:label="navigation_shopping_search">
+        android:label="@string/title_search">
         <action
             android:id="@+id/action_navigation_shopping_search_to_navigation_shopping"
             app:destination="@id/navigation_shopping" />
@@ -64,7 +64,7 @@
     <fragment
         android:id="@+id/navigation_weight"
         android:name="com.example.smartcart.ui.camera.WeightFragment"
-        android:label="navigation_weight"
+        android:label="Weight"
         tools:layout="@layout/fragment_weight" >
         <action
             android:id="@+id/action_navigation_weight_to_navigation_camera"
@@ -77,10 +77,16 @@
     <fragment
         android:id="@+id/navigation_not_shopping_search"
         android:name="com.example.smartcart.ui.not_shopping.NotShoppingItemSearchFragment"
-        android:label="navigation_not_shopping_search">
+        android:label="@string/title_search">
         <action
             android:id="@+id/action_navigation_not_shopping_search_to_navigation_not_shopping"
             app:destination="@id/navigation_not_shopping" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_stats"
+        android:name="com.example.smartcart.ui.stats.StatsFragment"
+        android:label="@string/title_stats">
     </fragment>
 
 </navigation>

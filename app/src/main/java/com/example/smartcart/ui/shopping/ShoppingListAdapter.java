@@ -23,6 +23,10 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         this.history = history;
     }
 
+    public void refreshList(ArrayList<ShoppingList> history) {
+        this.history = history;
+    }
+
     @Override
     public ShoppingListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.shopping_list_entry, parent, false);

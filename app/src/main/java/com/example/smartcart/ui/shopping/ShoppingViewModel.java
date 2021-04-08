@@ -10,6 +10,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 public class ShoppingViewModel extends ViewModel {
@@ -17,7 +18,7 @@ public class ShoppingViewModel extends ViewModel {
     // used for communicating between fragments/dialogs
     private MutableLiveData<ArrayList<ShoppingListItem>> shoppingList;
     private Set<String> itemNames;
-    public  MutableLiveData<BigDecimal> total;
+    public  MutableLiveData<BigDecimal> subtotal; //TODO: add gst
     private MutableLiveData<SearchItem> nextItem;
     private MutableLiveData<ArrayList<ShoppingList>> history;
     private MutableLiveData<Boolean> sessionActive;
@@ -26,8 +27,8 @@ public class ShoppingViewModel extends ViewModel {
         shoppingList = new MutableLiveData<>();
         shoppingList.setValue(new ArrayList<>());
         itemNames = new HashSet<>();
-        total = new MutableLiveData<>();
-        total.setValue(new BigDecimal("0.00"));
+        subtotal = new MutableLiveData<>();
+        subtotal.setValue(new BigDecimal("0.00"));
 
         nextItem = new MutableLiveData<>();
 
@@ -62,7 +63,7 @@ public class ShoppingViewModel extends ViewModel {
         } else {
             temp_list.add(item);
         }
-        total.setValue(total.getValue().add(item.getTotalPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
+        subtotal.setValue(subtotal.getValue().add(item.getTotalPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
         itemNames.add(item.getItemName());
         shoppingList.setValue(temp_list);
     }
@@ -78,22 +79,27 @@ public class ShoppingViewModel extends ViewModel {
         } else {
             item.setQuantity(item.getQuantity() - 1);
         }
-        total.setValue(total.getValue().subtract(item.getPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
+        subtotal.setValue(subtotal.getValue().subtract(item.getPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
         shoppingList.setValue(new ArrayList<>(temp_list));
     }
 
     public void clearShoppingListAndAddToHistory() {
         ArrayList<ShoppingList> temp_history = new ArrayList<>(history.getValue());
-        temp_history.add(new ShoppingList(shoppingList.getValue(), total.getValue(), String.format("Shopping List #%s", temp_history.size())));
+        temp_history.add(new ShoppingList(shoppingList.getValue(), subtotal.getValue(), String.format("Shopping List #%s", (new Random()).nextInt(10))));
         history.setValue(new ArrayList<>(temp_history));
 
         shoppingList.setValue(new ArrayList<>());
         itemNames = new HashSet<>();
-        total.setValue(new BigDecimal("0.00"));
+        subtotal.setValue(new BigDecimal("0.00"));
     }
 
-    public void setHistory(ArrayList<ShoppingList> shoppingList) {
-        history.setValue(shoppingList);
+    public void addHistory(ShoppingList shoppingList) {
+        ArrayList<ShoppingList> temp_history = new ArrayList<>(history.getValue());
+        temp_history.add(shoppingList);
+        history.setValue(new ArrayList<>(temp_history));
+    }
+    public ShoppingList getRecentShoppingList() {
+        return history.getValue().get(history.getValue().size() - 1);
     }
 
     private void initShoppingList() {

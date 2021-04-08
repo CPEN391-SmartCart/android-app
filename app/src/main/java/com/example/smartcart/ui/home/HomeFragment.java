@@ -24,6 +24,8 @@ import com.example.smartcart.ui.shopping.ShoppingListAdapter;
 import com.example.smartcart.ui.shopping.ShoppingListItemAdapter;
 import com.example.smartcart.ui.shopping.ShoppingViewModel;
 
+import java.util.ArrayList;
+
 public class HomeFragment extends Fragment {
 
     private ShoppingViewModel shoppingViewModel;
@@ -52,6 +54,14 @@ public class HomeFragment extends Fragment {
         recycler.setLayoutManager(layoutManager);
         adapter = new ShoppingListAdapter(getActivity().getApplicationContext(), shoppingViewModel.getHistory().getValue());
         recycler.setAdapter(adapter);
+
+        shoppingViewModel.getHistory().observe(getActivity(), new Observer<ArrayList<ShoppingList>>() {
+            @Override
+            public void onChanged(ArrayList<ShoppingList> shoppingLists) {
+                adapter.refreshList(shoppingViewModel.getHistory().getValue());
+                adapter.notifyDataSetChanged();
+            }
+        });
 
         return root;
     }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/navigation_home"
@@ -15,6 +16,11 @@
         android:id="@+id/navigation_not_shopping"
         android:icon="@drawable/ic_analytic"
         android:title="@string/title_not_shopping" />
+
+    <item
+        android:id="@+id/navigation_stats"
+        android:icon="@drawable/ic_analytic"
+        android:title="Stats" />
 
     <item
         android:id="@+id/navigation_camera"

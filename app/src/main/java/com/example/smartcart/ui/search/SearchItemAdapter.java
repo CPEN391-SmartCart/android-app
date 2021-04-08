@@ -13,6 +13,7 @@ import com.example.smartcart.R;
 
 import org.w3c.dom.Text;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -27,6 +28,11 @@ public class SearchItemAdapter extends RecyclerView.Adapter<SearchItemAdapter.Se
         this.item_list = item_list;
         this.filtered_item_list.addAll(item_list);
         this.add_item = add_item;
+    }
+
+    public void refreshList(ArrayList<SearchItem> item_list) {
+        this.filtered_item_list = item_list;
+        this.item_list = item_list;
     }
 
     @Override
@@ -53,7 +59,11 @@ public class SearchItemAdapter extends RecyclerView.Adapter<SearchItemAdapter.Se
     @Override
     public void onBindViewHolder(SearchItemViewHolder holder, int position) {
         holder.itemName.setText(filtered_item_list.get(position).getName());
-        holder.price.setText(String.format("$%s", filtered_item_list.get(position).getPrice()));
+        if (filtered_item_list.get(position).getPrice().equals(new BigDecimal("0.0"))) {
+            holder.price.setText("");
+        } else {
+            holder.price.setText(String.format("$%s", filtered_item_list.get(position).getPrice()));
+        }
         holder.barcode.setText(filtered_item_list.get(position).getBarcode());
     }
 

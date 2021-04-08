@@ -24,6 +24,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -40,6 +41,7 @@ import com.example.smartcart.util.LocalDateConverter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import org.jetbrains.annotations.NotNull;
@@ -76,17 +78,19 @@ public class HomeActivity extends AppCompatActivity {
 
     private final ArrayList<SearchItem> searchableItems = new ArrayList<>();
     ShoppingViewModel shoppingViewModel;
+    String googleId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        googleId = getIntent().getStringExtra("googleId");
         shoppingViewModel = new ViewModelProvider(this).get(ShoppingViewModel.class);
         setContentView(R.layout.activity_home);
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_shopping, R.id.navigation_not_shopping, R.id.navigation_camera)
+                R.id.navigation_home, R.id.navigation_shopping, R.id.navigation_not_shopping, R.id.navigation_stats, R.id.navigation_camera)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
@@ -114,29 +118,44 @@ public class HomeActivity extends AppCompatActivity {
         });
         initializeBluetooth();
         initializeSearchableItems();
-        initializeHistory();
+        initializeReceipts();
     }
 
-    private void initializeHistory() {
-        try (FileInputStream file = this.openFileInput("history.txt")) {
-            InputStreamReader input = new InputStreamReader(file, StandardCharsets.UTF_8);
-            StringBuilder stringBuilder = new StringBuilder();
-            BufferedReader reader = new BufferedReader(input);
-            String line = reader.readLine();
-            while (line != null) {
-                stringBuilder.append(line);
-                line = reader.readLine();
+    public String getGoogleId() {
+        return googleId;
+    }
+
+    private void initializeReceipts() {
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url ="https://cpen391-smartcart.herokuapp.com/receipts/" + googleId;
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            System.out.println(response);
+                            JSONArray resp = new JSONArray(response);
+                            for (int i = 0; i < resp.length(); i++) {
+                                JSONObject receipt = resp.getJSONObject(i);
+                                shoppingViewModel.addHistory(new ShoppingList(receipt.getDouble("subtotal"), receipt.getString("created_at")));
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println(error);
             }
-            String content = stringBuilder.toString();
-            GsonBuilder builder = new GsonBuilder();
-            builder.registerTypeAdapter(new TypeToken<LocalDate>(){}.getType(), new LocalDateConverter());
-            Gson gson = builder.create();
-            Type type = new TypeToken<ArrayList<ShoppingList>>() {}.getType();
-            ArrayList<ShoppingList> history = gson.fromJson(content, type);
-            shoppingViewModel.setHistory(history);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        });
+
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, 5, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest);
     }
 
     private void initializeSearchableItems() {
@@ -288,6 +307,12 @@ public class HomeActivity extends AppCompatActivity {
             btt = new ConnectedThread(mmSocket);
             btt.start();
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     public static void handleReadMessage(String msg) {

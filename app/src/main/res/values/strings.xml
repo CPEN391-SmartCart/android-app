@@ -14,6 +14,8 @@
     <string name="title_shopping">Shopping Cart</string>
     <string name="title_not_shopping">Planning</string>
     <string name="title_camera">Camera</string>
+    <string name="title_search">Search</string>
+    <string name="title_stats">Statistics</string>
     <string name="search_hint">Search items</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="auto_manual_text">Auto</string>

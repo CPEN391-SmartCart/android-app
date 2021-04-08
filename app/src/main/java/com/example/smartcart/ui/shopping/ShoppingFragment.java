@@ -68,10 +68,10 @@ public class ShoppingFragment extends Fragment {
 
         // cart_total
         TextView cart_total = root.findViewById(R.id.total_cart);
-        shoppingViewModel.total.observe(getActivity(), new Observer<BigDecimal>() {
+        shoppingViewModel.subtotal.observe(getActivity(), new Observer<BigDecimal>() {
             @Override
             public void onChanged(BigDecimal bigDecimal) {
-                cart_total.setText(String.format("Total: $%s", shoppingViewModel.total.getValue().toString()));
+                cart_total.setText(String.format("Total: $%s", shoppingViewModel.subtotal.getValue().toString()));
             }
         });
 

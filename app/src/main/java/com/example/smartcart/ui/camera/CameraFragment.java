@@ -80,10 +80,9 @@ public class CameraFragment extends Fragment {
         barcodeData = "";
         initialiseDetectorsAndSources();
 
-        /*
-        HomeActivity.btt.addItemChangedCallback(item -> {
+        HomeActivity.addItemChangedCallback(item -> {
             // add to camera view list
-            previouslyScannedBarcodes.addLast(item.name_);
+            previouslyScannedBarcodes.addLast(item.name);
             while(previouslyScannedBarcodes.size() > PREVIOUSLY_SCANNED_BARCODE_QUEUE_SIZE) {
                 previouslyScannedBarcodes.poll();
             }
@@ -93,10 +92,10 @@ public class CameraFragment extends Fragment {
                 i++;
             }
 
-            if(item.byWeight_) {
+            if(item.byWeight) {
                 Bundle bundle = new Bundle();
-                bundle.putString("itemName", item.name_);
-                bundle.putDouble("itemPricePerGrams", item.price_);
+                bundle.putString("itemName", item.name);
+                bundle.putDouble("itemPricePerGrams", item.price);
                 Activity act = this.getActivity();
                 NavController navController = Navigation.findNavController(this.getActivity(), R.id.nav_host_fragment);
                 if (navController.getCurrentDestination().getId() == R.id.navigation_camera) {
@@ -104,12 +103,11 @@ public class CameraFragment extends Fragment {
                 }
             }
             else {
-                HomeActivity.btt.write("ic:" + item.price_);
-                shoppingViewModel.addShoppingListItem(new ShoppingListItem(1, item.name_, item.price_));
-                Toast.makeText(getContext(), "Added " + item.name_ + " to your cart", Toast.LENGTH_SHORT).show();
+                HomeActivity.bluetooth.send("ic:" + item.price);
+                shoppingViewModel.addShoppingListItem(new ShoppingListItem(1, item.name, item.price));
+                Toast.makeText(getContext(), "Added " + item.name + " to your cart", Toast.LENGTH_SHORT).show();
             }
         });
-         */
 
         return root;
     }
@@ -195,10 +193,7 @@ public class CameraFragment extends Fragment {
         Toast.makeText(getContext(), "Scanned barcode " + barcodeData, Toast.LENGTH_SHORT).show();
 
         HomeActivity.bluetooth.send("sc:" + barcodeData);
-//        HomeActivity.btt.clearLastLookupItem();
-//        HomeActivity.btt.write("sc:" + barcodeData);
-
-        //HomeActivity.handleReadMessage("in:Apple");
-        //HomeActivity.handleReadMessage("pw:129");
+        HomeActivity.resetItem();
+        HomeActivity.bluetooth.send("sc:" + barcodeData);
     }
 }

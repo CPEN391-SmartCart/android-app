@@ -67,7 +67,17 @@ public class HomeActivity extends AppCompatActivity {
     String googleId;
 
     public static Bluetooth bluetooth;
+    final static private ArrayList<DoubleUpdateHandler> weightUpdateHandlers = new ArrayList<>();
+    final static private ArrayList<ItemUpdateHandler> itemUpdateHandlers = new ArrayList<>();
     public static Item item;
+
+    public static void addWeightChangedCallback(DoubleUpdateHandler handler){
+        weightUpdateHandlers.add(handler);
+    }
+
+    public static void addItemChangedCallback(ItemUpdateHandler handler){
+        itemUpdateHandlers.add(handler);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -298,17 +308,28 @@ public class HomeActivity extends AppCompatActivity {
                 case "pw": //price by weight
                     item.setByWeight(true);
                     item.setPrice(Double.parseDouble(field.substring(1)));
-                    bluetooth.send("ic");
+                    for (ItemUpdateHandler handler : itemUpdateHandlers)
+                    {
+                        handler.handleItemUpdate(item);
+                    }
                     break;
 
                 case "pq": //price without weight
                     item.setByWeight(false);
                     item.setPrice(Double.parseDouble(field.substring(1)));
-                    bluetooth.send("ic");
+                    for (ItemUpdateHandler handler : itemUpdateHandlers)
+                    {
+                        handler.handleItemUpdate(item);
+                    }
                     break;
 
                 case "sw": //set scale weight
-                    item.setWeight(Double.parseDouble(field));
+                    double weight = Double.parseDouble(field);
+                    item.setWeight(weight);
+                    for (DoubleUpdateHandler handler : weightUpdateHandlers)
+                    {
+                        handler.handleDoubleUpdate(weight);
+                    }
                     break;
 
                 default:
@@ -360,5 +381,17 @@ public class HomeActivity extends AppCompatActivity {
         {
             return this.weight = weight;
         }
+    }
+
+    public static void resetItem(){
+        item = new Item();
+    }
+
+    public interface DoubleUpdateHandler {
+        void handleDoubleUpdate(double val);
+    }
+
+    public interface ItemUpdateHandler {
+        void handleItemUpdate(Item item);
     }
 }

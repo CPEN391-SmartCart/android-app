@@ -2,13 +2,16 @@ package com.example.smartcart;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Camera;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -21,7 +24,6 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -36,38 +38,22 @@ import com.example.smartcart.ui.shopping.ShoppingItemSearchFragment;
 import com.example.smartcart.ui.shopping.ShoppingList;
 import com.example.smartcart.ui.shopping.ShoppingListItem;
 import com.example.smartcart.ui.shopping.ShoppingViewModel;
-import com.example.smartcart.util.LocalDateConverter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.List;
 import java.util.UUID;
 
 import me.aflak.bluetooth.Bluetooth;
 import me.aflak.bluetooth.interfaces.DeviceCallback;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 public class HomeActivity extends AppCompatActivity {
     private static final String BT_TAG = "MY_APP_DEBUG_TAG";
     private static final int REQUEST_ENABLE_BT = 1;
-    public final static String MODULE_MAC = "20:18:11:21:24:11";
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
     private final ArrayList<SearchItem> searchableItems = new ArrayList<>();
@@ -75,7 +61,6 @@ public class HomeActivity extends AppCompatActivity {
     String googleId;
 
     private NavController navController;
-
     private Bluetooth bluetooth;
 
     @Override
@@ -115,7 +100,7 @@ public class HomeActivity extends AppCompatActivity {
 
             return true;
         });
-        //initializeBluetooth();
+
         initBluetooth();
         initializeSearchableItems();
         initializeReceipts();
@@ -251,21 +236,16 @@ public class HomeActivity extends AppCompatActivity {
     {
         bluetooth = new Bluetooth(this);
         bluetooth.setDeviceCallback(deviceCallback);
+        shoppingViewModel.setBluetooth(bluetooth);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         bluetooth.onStart();
-        if (bluetooth.isEnabled())
-        {
-            Log.d("BT", "ENABLED");
-            Log.d("BT", bluetooth.getPairedDevices().toString());
-            bluetooth.connectToAddress("20:18:11:21:24:11");
-            Log.d("BT", String.valueOf(bluetooth.isConnected()));
-        }
-        else
-        {
+
+        if(!bluetooth.isEnabled()){
+            Toast.makeText(HomeActivity.this, "Enabling bluetooth", Toast.LENGTH_LONG).show();
             bluetooth.enable();
         }
     }
@@ -280,6 +260,7 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         public void onDeviceConnected(BluetoothDevice device) {
             //Toast.makeText(HomeActivity.this, "Connected to: " + device + "!", Toast.LENGTH_LONG).show();
+            shoppingViewModel.getBluetoothButton().setText("Connected");
         }
 
         @Override
@@ -310,6 +291,7 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         public void onConnectError(BluetoothDevice device, String message) {
             Log.d("BT", message);
+            shoppingViewModel.getBluetoothButton().setText("Retry");
         }
     };
 }

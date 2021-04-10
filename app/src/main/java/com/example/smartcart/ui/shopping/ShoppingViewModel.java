@@ -1,5 +1,7 @@
 package com.example.smartcart.ui.shopping;
 
+import android.widget.Button;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -13,6 +15,8 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
+import me.aflak.bluetooth.Bluetooth;
+
 public class ShoppingViewModel extends ViewModel {
 
     // used for communicating between fragments/dialogs
@@ -22,6 +26,8 @@ public class ShoppingViewModel extends ViewModel {
     private MutableLiveData<SearchItem> nextItem;
     private MutableLiveData<ArrayList<ShoppingList>> history;
     private MutableLiveData<Boolean> sessionActive;
+    private Bluetooth bluetooth;
+    private Button bluetoothButton;
 
     public ShoppingViewModel() {
         shoppingList = new MutableLiveData<>();
@@ -47,6 +53,11 @@ public class ShoppingViewModel extends ViewModel {
     public void setNextItem(SearchItem nextItem) {
         this.nextItem.setValue(nextItem);
     }
+    public void setBluetooth(Bluetooth bluetooth) { this.bluetooth = bluetooth; }
+    public void setBluetoothButton(Button bluetoothButton) { this.bluetoothButton = bluetoothButton; }
+    public Bluetooth getBluetooth() {return this.bluetooth; }
+    public Button getBluetoothButton() {return this.bluetoothButton; }
+
     public SearchItem getNextItem() {return nextItem.getValue(); }
 
     public LiveData<ArrayList<ShoppingListItem>> getShoppingList() { return shoppingList; }

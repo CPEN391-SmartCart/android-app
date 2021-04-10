@@ -77,23 +77,23 @@ public class NotShoppingViewModel extends ViewModel {
 
     private void initShoppingList() {
 
-        addShoppingListItem(new ShoppingListItem(1, "Pickles", 9.90));
-        addShoppingListItem(new ShoppingListItem(1, "Mayo", 3.99));
-        addShoppingListItem(new ShoppingListItem(1, "Bread", 1.99));
-        addShoppingListItem(new ShoppingListItem(2, "Cheese", 1.99));
-        addShoppingListItem(new ShoppingListItem(3, "Mountain Dew", 3.99));
-        addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
-        addShoppingListItem(new ShoppingListItem(1, "Chug Jug", 9.90));
-        addShoppingListItem(new ShoppingListItem(1, "Mayo", 3.99));
-        addShoppingListItem(new ShoppingListItem(1, "Bread", 1.99));
-        addShoppingListItem(new ShoppingListItem(1, "Cheese", 1.99));
-        addShoppingListItem(new ShoppingListItem(1, "Mountain Dew", 3.99));
-        addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
-        addShoppingListItem(new ShoppingListItem(1, "Pickles", 9.90));
-        addShoppingListItem(new ShoppingListItem(1, "Mayo", 3.99));
-        addShoppingListItem(new ShoppingListItem(1, "Bread", 1.99));
-        addShoppingListItem(new ShoppingListItem(1, "Cheese", 1.99));
-        addShoppingListItem(new ShoppingListItem(1, "Mountain Dew", 3.99));
-        addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Pickles", 9.90));
+//        addShoppingListItem(new ShoppingListItem(1, "Mayo", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Bread", 1.99));
+//        addShoppingListItem(new ShoppingListItem(2, "Cheese", 1.99));
+//        addShoppingListItem(new ShoppingListItem(3, "Mountain Dew", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Chug Jug", 9.90));
+//        addShoppingListItem(new ShoppingListItem(1, "Mayo", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Bread", 1.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Cheese", 1.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Mountain Dew", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Pickles", 9.90));
+//        addShoppingListItem(new ShoppingListItem(1, "Mayo", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Bread", 1.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Cheese", 1.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Mountain Dew", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
     }
 }

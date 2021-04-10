@@ -48,7 +48,7 @@
         android:id="@+id/navigation_camera"
         android:name="com.example.smartcart.ui.camera.CameraFragment"
         android:label="@string/title_camera"
-        tools:layout="@layout/fragment_camera" >
+        tools:layout="@layout/activity_camera" >
         <action
             android:id="@+id/action_navigation_camera_to_navigation_weight"
             app:destination="@id/navigation_weight" />

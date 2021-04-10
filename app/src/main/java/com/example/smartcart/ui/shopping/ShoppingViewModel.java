@@ -63,9 +63,9 @@ public class ShoppingViewModel extends ViewModel {
         } else {
             temp_list.add(item);
         }
-        subtotal.setValue(subtotal.getValue().add(item.getTotalPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
+        subtotal.postValue(subtotal.getValue().add(item.getTotalPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
         itemNames.add(item.getItemName());
-        shoppingList.setValue(temp_list);
+        shoppingList.postValue(temp_list);
     }
 
     public void removeShoppingListItem(String itemName) {
@@ -104,24 +104,24 @@ public class ShoppingViewModel extends ViewModel {
 
     private void initShoppingList() {
 
-        addShoppingListItem(new ShoppingListItem(1, "Pickles", 9.90));
-        addShoppingListItem(new ShoppingListItem(1, "Mayo", 3.99));
-        addShoppingListItem(new ShoppingListItem(1, "Bread", 1.99));
-        addShoppingListItem(new ShoppingListItem(2, "Cheese", 1.99));
-        addShoppingListItem(new ShoppingListItem(3, "Mountain Dew", 3.99));
-        addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
-        addShoppingListItem(new ShoppingListItem(1, "Chug Jug", 9.90));
-        addShoppingListItem(new ShoppingListItem(1, "Mayo", 3.99));
-        addShoppingListItem(new ShoppingListItem(1, "Bread", 1.99));
-        addShoppingListItem(new ShoppingListItem(1, "Cheese", 1.99));
-        addShoppingListItem(new ShoppingListItem(1, "Mountain Dew", 3.99));
-        addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
-        addShoppingListItem(new ShoppingListItem(1, "Pickles", 9.90));
-        addShoppingListItem(new ShoppingListItem(1, "Mayo", 3.99));
-        addShoppingListItem(new ShoppingListItem(1, "Bread", 1.99));
-        addShoppingListItem(new ShoppingListItem(1, "Cheese", 1.99));
-        addShoppingListItem(new ShoppingListItem(1, "Mountain Dew", 3.99));
-        addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
-        addShoppingListItem(new ShoppingListItem(6.9, "Fiji Apples", 1.29));
+//        addShoppingListItem(new ShoppingListItem(1, "Pickles", 9.90));
+//        addShoppingListItem(new ShoppingListItem(1, "Mayo", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Bread", 1.99));
+//        addShoppingListItem(new ShoppingListItem(2, "Cheese", 1.99));
+//        addShoppingListItem(new ShoppingListItem(3, "Mountain Dew", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Chug Jug", 9.90));
+//        addShoppingListItem(new ShoppingListItem(1, "Mayo", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Bread", 1.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Cheese", 1.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Mountain Dew", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Pickles", 9.90));
+//        addShoppingListItem(new ShoppingListItem(1, "Mayo", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Bread", 1.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Cheese", 1.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Mountain Dew", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
+//        addShoppingListItem(new ShoppingListItem(6.9, "Fiji Apples", 1.29));
     }
 }

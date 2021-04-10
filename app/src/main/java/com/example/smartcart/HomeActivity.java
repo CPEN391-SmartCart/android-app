@@ -1,12 +1,17 @@
 package com.example.smartcart;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
+import android.graphics.Camera;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -24,10 +29,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.smartcart.ui.camera.CameraActivity;
 import com.example.smartcart.ui.search.SearchItem;
 import com.example.smartcart.ui.shopping.ShoppingFragment;
 import com.example.smartcart.ui.shopping.ShoppingItemSearchFragment;
 import com.example.smartcart.ui.shopping.ShoppingList;
+import com.example.smartcart.ui.shopping.ShoppingListItem;
 import com.example.smartcart.ui.shopping.ShoppingViewModel;
 import com.example.smartcart.util.LocalDateConverter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -48,6 +55,7 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.UUID;
 
 import me.aflak.bluetooth.Bluetooth;
@@ -66,18 +74,9 @@ public class HomeActivity extends AppCompatActivity {
     ShoppingViewModel shoppingViewModel;
     String googleId;
 
-    public static Bluetooth bluetooth;
-    final static private ArrayList<DoubleUpdateHandler> weightUpdateHandlers = new ArrayList<>();
-    final static private ArrayList<ItemUpdateHandler> itemUpdateHandlers = new ArrayList<>();
-    public static Item item;
+    private NavController navController;
 
-    public static void addWeightChangedCallback(DoubleUpdateHandler handler){
-        weightUpdateHandlers.add(handler);
-    }
-
-    public static void addItemChangedCallback(ItemUpdateHandler handler){
-        itemUpdateHandlers.add(handler);
-    }
+    private Bluetooth bluetooth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +90,7 @@ public class HomeActivity extends AppCompatActivity {
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_home, R.id.navigation_shopping, R.id.navigation_not_shopping, R.id.navigation_stats, R.id.navigation_camera)
                 .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
@@ -110,7 +109,8 @@ public class HomeActivity extends AppCompatActivity {
             if (!shoppingViewModel.isSessionActive().getValue()) {
                 showErrorDialog();
             } else {
-                navController.navigate(R.id.navigation_camera);
+                Intent intent = new Intent(HomeActivity.this, CameraActivity.class);
+                startActivityForResult(intent, 2);
             }
 
             return true;
@@ -119,6 +119,27 @@ public class HomeActivity extends AppCompatActivity {
         initBluetooth();
         initializeSearchableItems();
         initializeReceipts();
+    }
+
+    @SuppressLint("DefaultLocale")
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 2)
+        {
+            if (data != null) {
+                String barcode = data.getStringExtra("BARCODE");
+                Log.d("BARCODE", barcode);
+                if (barcode != null) {
+                    Log.d("BARCODE", String.valueOf(barcode.length()));
+                    int length = 3 + barcode.length();
+                    Log.d("BARCODE", bluetooth.toString());
+                    bluetooth.send("sc:" + barcode);
+                    navController.navigate(R.id.navigation_shopping);
+                }
+            }
+        }
     }
 
     public String getGoogleId() {
@@ -230,7 +251,6 @@ public class HomeActivity extends AppCompatActivity {
     {
         bluetooth = new Bluetooth(this);
         bluetooth.setDeviceCallback(deviceCallback);
-        item = new Item();
     }
 
     @Override
@@ -241,7 +261,7 @@ public class HomeActivity extends AppCompatActivity {
         {
             Log.d("BT", "ENABLED");
             Log.d("BT", bluetooth.getPairedDevices().toString());
-            bluetooth.connectToDevice(bluetooth.getPairedDevices().get(7));
+            bluetooth.connectToAddress("20:18:11:21:24:11");
             Log.d("BT", String.valueOf(bluetooth.isConnected()));
         }
         else
@@ -259,7 +279,7 @@ public class HomeActivity extends AppCompatActivity {
     private DeviceCallback deviceCallback = new DeviceCallback() {
         @Override
         public void onDeviceConnected(BluetoothDevice device) {
-            Log.d("BT", "CONNECTED " + device.getName());
+            //Toast.makeText(HomeActivity.this, "Connected to: " + device + "!", Toast.LENGTH_LONG).show();
         }
 
         @Override
@@ -267,10 +287,19 @@ public class HomeActivity extends AppCompatActivity {
             Log.d("BT", "DISCONNECTED " + device.getName() + " | " + message);
         }
 
+        @SuppressLint("DefaultLocale")
         @Override
         public void onMessage(byte[] message) {
             String receivedMsg = new String(message);
-            handleReadMessage(receivedMsg);
+            Log.d("NICE", receivedMsg);
+            String[] item = receivedMsg.split("\\|");
+            String name = item[0];
+            double price = Double.parseDouble(item[1]);
+            shoppingViewModel.addShoppingListItem(new ShoppingListItem(1, name, price));
+
+            String ack = "ic:" + price;
+            int length = ack.length();
+            bluetooth.send(ack);
         }
 
         @Override
@@ -283,115 +312,4 @@ public class HomeActivity extends AppCompatActivity {
             Log.d("BT", message);
         }
     };
-
-    public static void handleReadMessage(String msg) {
-        String command = "";
-        String field = "";
-        Pattern pattern = Pattern.compile("(\\w+):(.*)");
-
-        String[] payload = msg.split("\\|", 5);
-
-        for(int i = 0; i < payload.length; i++){
-            String test = payload[i];
-            Matcher matcher = pattern.matcher(payload[i]);
-
-            while (matcher.find()) {
-                command =  matcher.group(1);
-                field = matcher.group(2);
-            }
-
-            switch (command){
-                case "in": //item
-                    item.setName(field);
-                    break;
-
-                case "pw": //price by weight
-                    item.setByWeight(true);
-                    item.setPrice(Double.parseDouble(field.substring(1)));
-                    for (ItemUpdateHandler handler : itemUpdateHandlers)
-                    {
-                        handler.handleItemUpdate(item);
-                    }
-                    break;
-
-                case "pq": //price without weight
-                    item.setByWeight(false);
-                    item.setPrice(Double.parseDouble(field.substring(1)));
-                    for (ItemUpdateHandler handler : itemUpdateHandlers)
-                    {
-                        handler.handleItemUpdate(item);
-                    }
-                    break;
-
-                case "sw": //set scale weight
-                    double weight = Double.parseDouble(field);
-                    item.setWeight(weight);
-                    for (DoubleUpdateHandler handler : weightUpdateHandlers)
-                    {
-                        handler.handleDoubleUpdate(weight);
-                    }
-                    break;
-
-                default:
-                    break; //error case possibly
-            }
-        }
-    }
-
-    public static class Item
-    {
-        public String name;
-        public double price;
-        public boolean byWeight;
-        public double weight;
-
-        public void setName(String name)
-        {
-            this.name = name;
-        }
-
-        public void setPrice(double price)
-        {
-            this.price = price;
-        }
-
-        public void setByWeight(boolean byWeight)
-        {
-            this.byWeight = byWeight;
-        }
-
-        public void setWeight(double weight)
-        {
-            this.weight = weight;
-        }
-
-        public String getName() {
-            return this.name;
-        }
-
-        public double getPrice() {
-            return this.price;
-        }
-
-        public boolean getByWeight() {
-            return this.byWeight;
-        }
-
-        public double getWeight()
-        {
-            return this.weight = weight;
-        }
-    }
-
-    public static void resetItem(){
-        item = new Item();
-    }
-
-    public interface DoubleUpdateHandler {
-        void handleDoubleUpdate(double val);
-    }
-
-    public interface ItemUpdateHandler {
-        void handleItemUpdate(Item item);
-    }
 }

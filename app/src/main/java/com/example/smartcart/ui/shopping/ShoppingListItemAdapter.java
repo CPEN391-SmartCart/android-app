@@ -1,10 +1,12 @@
 package com.example.smartcart.ui.shopping;
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -70,7 +72,13 @@ public class ShoppingListItemAdapter extends RecyclerView.Adapter<ShoppingListIt
             weight = (TextView) itemView.findViewById(R.id.weight);
             price = (TextView) itemView.findViewById(R.id.price);
             remove = (ImageButton) itemView.findViewById(R.id.remove);
-            remove.setOnClickListener(remove_item);
+            if (remove_item != null) {
+                remove.setOnClickListener(remove_item);
+            } else {
+                LinearLayout layout = itemView.findViewById(R.id.linearLayout2);
+                layout.setWeightSum(9);
+                remove.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 0f));
+            }
         }
     }
 }

@@ -31,6 +31,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 import cdflynn.android.library.checkview.CheckView;
 
@@ -67,19 +68,33 @@ public class ShoppingFragment extends Fragment {
         setHasOptionsMenu(true);
 
         // cart_total
-        TextView cart_total = root.findViewById(R.id.total_cart);
+        TextView cart_subtotal = root.findViewById(R.id.cart_subtotal);
+        TextView cart_gst = root.findViewById(R.id.cart_gst);
+        TextView cart_total = root.findViewById(R.id.cart_total);
         shoppingViewModel.subtotal.observe(getActivity(), new Observer<BigDecimal>() {
             @Override
             public void onChanged(BigDecimal bigDecimal) {
-                cart_total.setText(String.format("Total: $%s", shoppingViewModel.subtotal.getValue().toString()));
+                BigDecimal subtotal = shoppingViewModel.subtotal.getValue();
+                BigDecimal total = subtotal.multiply(new BigDecimal("1.05")).setScale(2, BigDecimal.ROUND_HALF_UP);
+                cart_subtotal.setText(String.format("Subtotal: $%s", subtotal.toString()));
+                cart_gst.setText(String.format("GST: $%s", total.subtract(subtotal).toString()));
+                cart_total.setText(String.format("Total: $%s", total.toString()));
             }
         });
 
         // checkout
         Button checkout = (Button) root.findViewById(R.id.checkout);
         checkout.setOnClickListener(v -> {
-            ShoppingCheckoutDialogFragment dialog = new ShoppingCheckoutDialogFragment();
-            dialog.show(getParentFragmentManager(), "");
+            if (shoppingViewModel.subtotal.getValue().compareTo(new BigDecimal(0)) == 0) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity())
+                        .setTitle("Error")
+                        .setMessage("Can't checkout with 0 items");
+                builder.setPositiveButton("Understood", null);
+                builder.create().show();
+            } else {
+                ShoppingCheckoutDialogFragment dialog = new ShoppingCheckoutDialogFragment();
+                dialog.show(getParentFragmentManager(), "");
+            }
         });
 
         // update recycler view on value change

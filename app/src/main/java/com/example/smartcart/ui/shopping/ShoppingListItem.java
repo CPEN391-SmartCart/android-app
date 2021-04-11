@@ -15,32 +15,13 @@ public class ShoppingListItem {
     private BigDecimal totalPrice;
     private BigDecimal weight;
 
-    public ShoppingListItem(int quantity, String itemName, double price) {
+    public ShoppingListItem(int quantity, String itemName, double price, double weight) {
         this.quantity = quantity;
         this.itemName = itemName;
         this.price = new BigDecimal(price).setScale(2, BigDecimal.ROUND_HALF_UP);
         this.totalPrice = this.price.multiply(new BigDecimal(quantity));
         this.totalPrice = this.totalPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
         this.weight = new BigDecimal("0.0");
-    }
-
-    public ShoppingListItem(int quantity, String itemName, BigDecimal price) {
-        this.quantity = quantity;
-        this.itemName = itemName;
-        this.price = price.setScale(2, BigDecimal.ROUND_HALF_UP);
-        this.totalPrice = this.price.multiply(new BigDecimal(quantity));
-        this.totalPrice = this.totalPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
-        this.weight = new BigDecimal("0.0");
-    }
-
-    public ShoppingListItem(double weight, String itemName, double price) {
-        this.quantity = 1;
-        this.itemName = itemName;
-        this.price = new BigDecimal(price).setScale(2, BigDecimal.ROUND_HALF_UP);
-
-        this.weight = new BigDecimal(weight).setScale(2, BigDecimal.ROUND_HALF_UP);
-        this.totalPrice = this.price.multiply(this.weight);
-        this.totalPrice = this.totalPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 
     public ShoppingListItem(int quantity, SearchItem searchitem) {

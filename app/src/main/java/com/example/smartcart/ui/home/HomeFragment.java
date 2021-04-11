@@ -70,22 +70,6 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        // set up recycler for shopping list histories
-        RecyclerView recycler = root.findViewById(R.id.history);
-        recycler.addItemDecoration(new DividerItemDecoration(getActivity().getApplicationContext(), DividerItemDecoration.VERTICAL));
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        recycler.setLayoutManager(layoutManager);
-        adapter = new ShoppingListAdapter(getActivity().getApplicationContext(), shoppingViewModel.getHistory().getValue());
-        recycler.setAdapter(adapter);
-
-        shoppingViewModel.getHistory().observe(getActivity(), new Observer<ArrayList<ShoppingList>>() {
-            @Override
-            public void onChanged(ArrayList<ShoppingList> shoppingLists) {
-                adapter.refreshList(shoppingViewModel.getHistory().getValue());
-                adapter.notifyDataSetChanged();
-            }
-        });
-
         return root;
     }
 

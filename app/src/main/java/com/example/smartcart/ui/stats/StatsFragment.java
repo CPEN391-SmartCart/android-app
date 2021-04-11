@@ -1,6 +1,8 @@
 package com.example.smartcart.ui.stats;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
+import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +10,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,6 +29,9 @@ import com.example.smartcart.R;
 import com.example.smartcart.ui.search.SearchItem;
 import com.example.smartcart.ui.search.SearchItemAdapter;
 import com.example.smartcart.ui.shopping.ShoppingList;
+import com.example.smartcart.ui.shopping.ShoppingListAdapter;
+import com.example.smartcart.ui.shopping.ShoppingListItemAdapter;
+import com.example.smartcart.ui.shopping.ShoppingViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,10 +42,13 @@ import java.util.ArrayList;
 
 public class StatsFragment extends Fragment {
 
-    StatsItemAdapter adapter;
+    StatsItemAdapter topItemsAdapter;
+    ShoppingListAdapter historyAdapter;
     ArrayList<StatsItem> topItems = new ArrayList<>();
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        ShoppingViewModel shoppingViewModel = new ViewModelProvider(requireActivity()).get(ShoppingViewModel.class);
         View root = inflater.inflate(R.layout.fragment_stats, container, false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
 
@@ -48,11 +58,27 @@ public class StatsFragment extends Fragment {
                 DividerItemDecoration.VERTICAL));
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         topItemsRecycler.setLayoutManager(layoutManager);
-        adapter = new StatsItemAdapter(getActivity().getApplicationContext(), topItems);
-        topItemsRecycler.setAdapter(adapter);
+        topItemsAdapter = new StatsItemAdapter(getActivity().getApplicationContext(), topItems);
+        topItemsRecycler.setAdapter(topItemsAdapter);
+
+        // set up recycler for shopping list histories
+        RecyclerView historyRecycler = root.findViewById(R.id.history);
+        historyRecycler.addItemDecoration(new DividerItemDecoration(getActivity().getApplicationContext(), DividerItemDecoration.VERTICAL));
+        LinearLayoutManager historyLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        historyRecycler.setLayoutManager(historyLayoutManager);
+        historyAdapter = new ShoppingListAdapter(getActivity(), shoppingViewModel.getHistory().getValue());
+        historyRecycler.setAdapter(historyAdapter);
+
+        shoppingViewModel.getHistory().observe(getActivity(), new Observer<ArrayList<ShoppingList>>() {
+            @Override
+            public void onChanged(ArrayList<ShoppingList> shoppingLists) {
+                historyAdapter.refreshList(shoppingViewModel.getHistory().getValue());
+                historyAdapter.notifyDataSetChanged();
+            }
+        });
 
         getStats();
-        adapter.notifyDataSetChanged();
+        shoppingViewModel.sortHistory();
         return root;
     }
 
@@ -69,8 +95,8 @@ public class StatsFragment extends Fragment {
                                 JSONObject item = items.getJSONObject(i);
                                 topItems.add(new StatsItem(item.getString("name"), item.getInt("count")));
                             }
-                            adapter.refreshList(topItems);
-                            adapter.notifyDataSetChanged();
+                            topItemsAdapter.refreshList(topItems);
+                            topItemsAdapter.notifyDataSetChanged();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

@@ -11,13 +11,12 @@
     <string name="login_failed">"Login failed"</string>
     <string name="title_activity_home">MainActivity</string>
     <string name="title_home">Home</string>
-    <string name="title_shopping">Shopping Cart</string>
+    <string name="title_shopping">Cart</string>
     <string name="title_not_shopping">Planning</string>
     <string name="title_camera">Camera</string>
     <string name="title_search">Search</string>
     <string name="title_stats">Statistics</string>
     <string name="search_hint">Search items</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="auto_manual_text">Auto</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="barcode_text_text">Current Barcode</string>
@@ -28,4 +27,6 @@
     <string name="current_item_cost">$1.29 / lb</string>
     <string name="add_to_cart">Add to Cart</string>
     <string name="scan">Scan</string>
+    <string name="most_purchased_items"><b>Most Purchased Items</b></string>
+    <string name="history"><b>History</b></string>
 </resources>

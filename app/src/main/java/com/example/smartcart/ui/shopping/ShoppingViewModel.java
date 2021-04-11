@@ -11,6 +11,7 @@ import com.example.smartcart.ui.search.SearchItem;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -111,6 +112,23 @@ public class ShoppingViewModel extends ViewModel {
     }
     public ShoppingList getRecentShoppingList() {
         return history.getValue().get(history.getValue().size() - 1);
+    }
+
+    public void sortHistory() {
+        ArrayList<ShoppingList> temp_history = new ArrayList<>(history.getValue());
+        temp_history.sort((o1, o2) -> {
+            String[] date1 = o1.getPurchaseDate().split("-");
+            String[] date2 = o2.getPurchaseDate().split("-");
+            for (int i = 2; i > -1; i--) {
+                if (Integer.parseInt(date1[i]) > Integer.parseInt(date2[i])) {
+                    return -1;
+                } else if (Integer.parseInt(date1[i]) > Integer.parseInt(date2[i])) {
+                    return 1;
+                }
+            }
+            return 0;
+        });
+        history.setValue(new ArrayList<>(temp_history));
     }
 
     private void initShoppingList() {

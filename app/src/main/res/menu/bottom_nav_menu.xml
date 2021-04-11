@@ -14,7 +14,7 @@
 
     <item
         android:id="@+id/navigation_not_shopping"
-        android:icon="@drawable/ic_analytic"
+        android:icon="@drawable/ic_not_shopping"
         android:title="@string/title_not_shopping" />
 
     <item

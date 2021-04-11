@@ -21,7 +21,8 @@ public class ShoppingList {
         this.name = name;
     }
 
-    public ShoppingList(double subtotal, String purchaseDate) {
+    public ShoppingList(ArrayList<ShoppingListItem> shoppingListItems, double subtotal, String purchaseDate) {
+        this.items = new ArrayList<>(shoppingListItems);
         this.subtotal = new BigDecimal(String.valueOf(subtotal)).setScale(2, BigDecimal.ROUND_HALF_UP);
         this.gst = this.subtotal.multiply(BigDecimal.valueOf(0.05)).setScale(2, BigDecimal.ROUND_HALF_UP);;
         this.totalPrice = this.subtotal.add(gst);

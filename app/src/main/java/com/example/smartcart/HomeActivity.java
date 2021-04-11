@@ -115,7 +115,7 @@ public class HomeActivity extends AppCompatActivity {
                     Log.d("BARCODE", String.valueOf(barcode.length()));
                     int length = 3 + barcode.length();
                     Log.d("BARCODE", bluetooth.toString());
-                    bluetooth.send("sc:" + barcode);
+                    bluetooth.send(String.format("%02d", length) + "sc:" + barcode);
                     navController.navigate(R.id.navigation_shopping);
                 }
             }
@@ -275,7 +275,7 @@ public class HomeActivity extends AppCompatActivity {
 
             String ack = "ic:" + price;
             int length = ack.length();
-            bluetooth.send(ack);
+            bluetooth.send(String.format("%02d", length) + ack);
         }
 
         @Override

@@ -59,6 +59,9 @@ public class HomeFragment extends Fragment {
         startSession.setOnClickListener(v -> {
             if (true ) { //TODO: check for bluetooth connection
                 shoppingViewModel.startSession();
+                String message = "rs: Resetting VGA display";
+                shoppingViewModel.getBluetooth().send(String.format("%02d", message.length()) + message); // reset display
+
                 Toast.makeText(getActivity(), "Session started", Toast.LENGTH_SHORT).show();
             }
         });

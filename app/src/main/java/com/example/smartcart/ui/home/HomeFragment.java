@@ -86,6 +86,12 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        if(bluetooth.isConnected()){
+            bluetoothButton.setText("Connected");
+        } else {
+            bluetoothButton.setText("Connect to SmartCart");
+        }
+
         return root;
     }
 

@@ -11,6 +11,7 @@ import com.example.smartcart.ui.search.SearchItem;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -113,26 +114,23 @@ public class ShoppingViewModel extends ViewModel {
         return history.getValue().get(history.getValue().size() - 1);
     }
 
-    private void initShoppingList() {
+    public void sortHistory() {
+        ArrayList<ShoppingList> temp_history = new ArrayList<>(history.getValue());
+        temp_history.sort((o1, o2) -> {
+            String[] date1 = o1.getPurchaseDate().split("-");
+            String[] date2 = o2.getPurchaseDate().split("-");
+            for (int i = 2; i > -1; i--) {
+                if (Integer.parseInt(date1[i]) > Integer.parseInt(date2[i])) {
+                    return -1;
+                } else if (Integer.parseInt(date1[i]) > Integer.parseInt(date2[i])) {
+                    return 1;
+                }
+            }
+            return 0;
+        });
+        history.setValue(new ArrayList<>(temp_history));
+    }
 
-//        addShoppingListItem(new ShoppingListItem(1, "Pickles", 9.90));
-//        addShoppingListItem(new ShoppingListItem(1, "Mayo", 3.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Bread", 1.99));
-//        addShoppingListItem(new ShoppingListItem(2, "Cheese", 1.99));
-//        addShoppingListItem(new ShoppingListItem(3, "Mountain Dew", 3.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Chug Jug", 9.90));
-//        addShoppingListItem(new ShoppingListItem(1, "Mayo", 3.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Bread", 1.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Cheese", 1.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Mountain Dew", 3.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Pickles", 9.90));
-//        addShoppingListItem(new ShoppingListItem(1, "Mayo", 3.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Bread", 1.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Cheese", 1.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Mountain Dew", 3.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
-//        addShoppingListItem(new ShoppingListItem(6.9, "Fiji Apples", 1.29));
+    private void initShoppingList() {
     }
 }

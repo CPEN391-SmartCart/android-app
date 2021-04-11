@@ -6,13 +6,14 @@
     android:layout_height="wrap_content">
 
     <LinearLayout
-        android:id="@+id/linearLayout2"
+        android:id="@+id/shopping_list_item_layout"
         android:layout_width="match_parent"
         android:layout_height="34dp"
         android:background="#ffffff"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:clickable="true"
         android:padding="5dp"
         android:weightSum="4">
 

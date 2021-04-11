@@ -34,6 +34,7 @@ public class StatsItemAdapter extends RecyclerView.Adapter<StatsItemAdapter.Stat
     public void onBindViewHolder(StatsItemViewHolder holder, int position) {
         holder.itemName.setText(item_list.get(position).getName());
         holder.count.setText(item_list.get(position).getCount().toString());
+        holder.cost.setText(String.format("$%s", item_list.get(position).getCost()));
     }
 
     @Override
@@ -45,11 +46,13 @@ public class StatsItemAdapter extends RecyclerView.Adapter<StatsItemAdapter.Stat
 
         private TextView itemName;
         private TextView count;
+        private TextView cost;
 
         public StatsItemViewHolder(View itemView) {
             super(itemView);
             itemName = itemView.findViewById(R.id.itemName);
             count = itemView.findViewById(R.id.count);
+            cost = itemView.findViewById(R.id.cost);
         }
     }
 }

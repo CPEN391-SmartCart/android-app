@@ -63,8 +63,8 @@ public class HomeFragment extends Fragment {
         shoppingViewModel.setBluetoothButton(bluetoothButton);
 
         startSession.setOnClickListener(v -> {
-            if (true ) { //TODO: check for bluetooth connection
-                shoppingViewModel.startSession();
+            shoppingViewModel.startSession();
+            if (shoppingViewModel.getBluetooth().getBluetoothAdapter() != null) { //TODO: check for bluetooth connection
                 String message = "rs: Resetting VGA display";
                 shoppingViewModel.getBluetooth().send(String.format("%02d", message.length()) + message); // reset display
 
@@ -83,22 +83,6 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 setupBluetooth();
-            }
-        });
-
-        // set up recycler for shopping list histories
-        RecyclerView recycler = root.findViewById(R.id.history);
-        recycler.addItemDecoration(new DividerItemDecoration(getActivity().getApplicationContext(), DividerItemDecoration.VERTICAL));
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        recycler.setLayoutManager(layoutManager);
-        adapter = new ShoppingListAdapter(getActivity().getApplicationContext(), shoppingViewModel.getHistory().getValue());
-        recycler.setAdapter(adapter);
-
-        shoppingViewModel.getHistory().observe(getActivity(), new Observer<ArrayList<ShoppingList>>() {
-            @Override
-            public void onChanged(ArrayList<ShoppingList> shoppingLists) {
-                adapter.refreshList(shoppingViewModel.getHistory().getValue());
-                adapter.notifyDataSetChanged();
             }
         });
 

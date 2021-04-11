@@ -42,6 +42,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -57,6 +58,7 @@ public class HomeActivity extends AppCompatActivity {
     ShoppingViewModel shoppingViewModel;
     NotShoppingViewModel notShoppingViewModel;
     String googleId;
+    RequestQueue queue;
 
     private NavController navController;
     private Bluetooth bluetooth;
@@ -67,6 +69,7 @@ public class HomeActivity extends AppCompatActivity {
         googleId = getIntent().getStringExtra("googleId");
         shoppingViewModel = new ViewModelProvider(this).get(ShoppingViewModel.class);
         notShoppingViewModel = new ViewModelProvider(this).get(NotShoppingViewModel.class);
+        queue = Volley.newRequestQueue(this);
 
         setContentView(R.layout.activity_home);
         BottomNavigationView navView = findViewById(R.id.nav_view);
@@ -145,7 +148,6 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void initializeReceipts() {
-        RequestQueue queue = Volley.newRequestQueue(this);
         String url ="https://cpen391-smartcart.herokuapp.com/receipts/" + googleId;
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
@@ -153,12 +155,43 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         try {
-                            System.out.println(response);
                             JSONArray resp = new JSONArray(response);
                             for (int i = 0; i < resp.length(); i++) {
                                 JSONObject receipt = resp.getJSONObject(i);
-                                shoppingViewModel.addHistory(new ShoppingList(receipt.getDouble("subtotal"), receipt.getString("created_at")));
+                                initializeReceiptItems(receipt.getString("id"), receipt.getDouble("subtotal"), receipt.getString("created_at"));
                             }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println(error);
+            }
+        });
+
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, 5, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest);
+    }
+
+    private void initializeReceiptItems(String receiptId, Double subtotal, String purchaseDate) {
+        String url ="https://cpen391-smartcart.herokuapp.com/receipt-items/" + receiptId;
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray items = new JSONArray(response);
+                            ArrayList<ShoppingListItem> shoppingListItems = new ArrayList<>();
+                            for (int i = 0; i < items.length(); i++) {
+                                JSONObject item = items.getJSONObject(i);
+                                shoppingListItems.add(new ShoppingListItem(item.getInt("quantity"), item.getString("name"), item.getDouble("cost"), item.getDouble("weight")));
+                            }
+                            shoppingViewModel.addHistory(new ShoppingList(shoppingListItems, subtotal, purchaseDate));
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -291,7 +324,7 @@ public class HomeActivity extends AppCompatActivity {
             String[] item = receivedMsg.split("\\|");
             String name = item[0];
             double price = Double.parseDouble(item[1]);
-            shoppingViewModel.addShoppingListItem(new ShoppingListItem(1, name, price));
+            shoppingViewModel.addShoppingListItem(new ShoppingListItem(1, name, price, 0.0));
 
             String ack = "ic:" + price;
             int length = ack.length();

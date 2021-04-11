@@ -93,7 +93,7 @@ public class StatsFragment extends Fragment {
                             JSONArray items = new JSONArray(response);
                             for (int i = 0; i < items.length(); i++) {
                                 JSONObject item = items.getJSONObject(i);
-                                topItems.add(new StatsItem(item.getString("name"), item.getInt("count")));
+                                topItems.add(new StatsItem(item.getString("name"), item.getInt("sum")));
                             }
                             topItemsAdapter.refreshList(topItems);
                             topItemsAdapter.notifyDataSetChanged();

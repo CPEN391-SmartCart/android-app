@@ -1,8 +1,5 @@
 package com.example.smartcart.ui.shopping;
 
-import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -26,8 +23,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.smartcart.HomeActivity;
 import com.example.smartcart.R;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.stripe.android.ApiResultCallback;
 import com.stripe.android.PaymentIntentResult;
 import com.stripe.android.Stripe;
@@ -40,15 +35,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.util.Objects;
-
-import okhttp3.OkHttpClient;
 
 public class ShoppingCheckoutDialogFragment extends DialogFragment {
 
@@ -60,6 +49,9 @@ public class ShoppingCheckoutDialogFragment extends DialogFragment {
     private String paymentIntentClientSecret;
     private Stripe stripe;
 
+    /**
+     * USE CARD 4242 4242 4242 4242 WITH ANY DATE IN THE FUTURE ANY CVC AND A 5? DIGIT NUMERICAL POSTAL CODE (US)
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -111,7 +103,9 @@ public class ShoppingCheckoutDialogFragment extends DialogFragment {
                 shoppingViewModel.stopSession();
                 PostReceipt();
                 String message = "sp: Payment Successful";
-                shoppingViewModel.getBluetooth().send(String.format("%02d", message.length()) + message); // on successful payment
+                if (shoppingViewModel.getBluetooth().getBluetoothAdapter() != null) {
+                    shoppingViewModel.getBluetooth().send(String.format("%02d", message.length()) + message);
+                }
                 dismiss();
             } else if (status == PaymentIntent.Status.RequiresPaymentMethod) {
                 // Payment failed – allow retrying using a different payment method

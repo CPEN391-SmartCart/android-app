@@ -110,6 +110,8 @@ public class ShoppingCheckoutDialogFragment extends DialogFragment {
                 shoppingViewModel.clearShoppingListAndAddToHistory();
                 shoppingViewModel.stopSession();
                 PostReceipt();
+                String message = "sp: Payment Successful";
+                shoppingViewModel.getBluetooth().send(String.format("%02d", message.length()) + message); // on successful payment
                 dismiss();
             } else if (status == PaymentIntent.Status.RequiresPaymentMethod) {
                 // Payment failed – allow retrying using a different payment method

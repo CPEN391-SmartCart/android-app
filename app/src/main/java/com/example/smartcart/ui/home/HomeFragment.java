@@ -57,8 +57,11 @@ public class HomeFragment extends Fragment {
         shoppingViewModel.setBluetoothButton(bluetoothButton);
 
         startSession.setOnClickListener(v -> {
-            if (true ) { //TODO: check for bluetooth connection
-                shoppingViewModel.startSession();
+            shoppingViewModel.startSession();
+            if (shoppingViewModel.getBluetooth().getBluetoothAdapter() != null) { //TODO: check for bluetooth connection
+                String message = "rs: Resetting VGA display";
+                shoppingViewModel.getBluetooth().send(String.format("%02d", message.length()) + message); // reset display
+
                 Toast.makeText(getActivity(), "Session started", Toast.LENGTH_SHORT).show();
             }
         });
@@ -69,6 +72,12 @@ public class HomeFragment extends Fragment {
                 setupBluetooth();
             }
         });
+
+        if(bluetooth.isConnected()){
+            bluetoothButton.setText("Connected");
+        } else {
+            bluetoothButton.setText("Connect to SmartCart");
+        }
 
         return root;
     }

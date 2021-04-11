@@ -2,16 +2,12 @@ package com.example.smartcart;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -46,7 +42,6 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import me.aflak.bluetooth.Bluetooth;
@@ -124,7 +119,7 @@ public class HomeActivity extends AppCompatActivity {
                     Log.d("BARCODE", String.valueOf(barcode.length()));
                     int length = 3 + barcode.length();
                     Log.d("BARCODE", bluetooth.toString());
-                    bluetooth.send("sc:" + barcode);
+                    bluetooth.send(String.format("%02d", length) + "sc:" + barcode);
                     navController.navigate(R.id.navigation_shopping);
                 }
             }
@@ -314,7 +309,7 @@ public class HomeActivity extends AppCompatActivity {
 
             String ack = "ic:" + price;
             int length = ack.length();
-            bluetooth.send(ack);
+            bluetooth.send(String.format("%02d", length) + ack);
         }
 
         @Override

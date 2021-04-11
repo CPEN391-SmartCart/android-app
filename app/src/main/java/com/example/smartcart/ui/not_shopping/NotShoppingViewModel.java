@@ -1,16 +1,24 @@
 package com.example.smartcart.ui.not_shopping;
 
+import android.widget.Button;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.smartcart.items.BarcodeUUID;
 import com.example.smartcart.ui.search.SearchItem;
+import com.example.smartcart.ui.shopping.ShoppingList;
 import com.example.smartcart.ui.shopping.ShoppingListItem;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
+
+import me.aflak.bluetooth.Bluetooth;
 
 public class NotShoppingViewModel extends ViewModel {
 
@@ -19,11 +27,14 @@ public class NotShoppingViewModel extends ViewModel {
     private Set<String> itemNames;
     public  MutableLiveData<BigDecimal> total;
     private MutableLiveData<SearchItem> nextItem;
+    private Set<BarcodeUUID> scannedItems;
+    private Bluetooth bluetooth;
 
     public NotShoppingViewModel() {
         shoppingList = new MutableLiveData<>();
         shoppingList.setValue(new ArrayList<>());
         itemNames = new HashSet<>();
+        scannedItems = new HashSet<>();
         total = new MutableLiveData<>();
         total.setValue(new BigDecimal("0.00"));
 
@@ -31,12 +42,33 @@ public class NotShoppingViewModel extends ViewModel {
         initShoppingList();
     }
 
+    public void setBluetooth(Bluetooth bluetooth) { this.bluetooth = bluetooth; }
+    public Bluetooth getBluetooth() {return this.bluetooth; }
+
     public void setNextItem(SearchItem nextItem) {
         this.nextItem.setValue(nextItem);
     }
     public SearchItem getNextItem() {return nextItem.getValue(); }
 
     public LiveData<ArrayList<ShoppingListItem>> getShoppingList() { return shoppingList; }
+
+    public void addScannedItem(BarcodeUUID item)
+    {
+        this.scannedItems.add(item);
+    }
+
+    public ShoppingListItem getNextPathedItem()
+    {
+        for (ShoppingListItem shoppingListItem : shoppingList.getValue())
+        {
+            if (!scannedItems.contains(new BarcodeUUID(shoppingListItem.getBarcode(), shoppingListItem.getUUID())))
+            {
+                return shoppingListItem;
+            }
+        }
+
+        return null;
+    }
 
     public void addShoppingListItem(ShoppingListItem item) {
         ArrayList<ShoppingListItem> temp_list = new ArrayList<>(shoppingList.getValue());

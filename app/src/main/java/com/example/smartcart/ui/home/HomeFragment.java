@@ -24,8 +24,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.smartcart.HomeActivity;
 import com.example.smartcart.R;
+import com.example.smartcart.ui.not_shopping.NotShoppingViewModel;
 import com.example.smartcart.ui.shopping.ShoppingList;
 import com.example.smartcart.ui.shopping.ShoppingListAdapter;
+import com.example.smartcart.ui.shopping.ShoppingListItem;
 import com.example.smartcart.ui.shopping.ShoppingListItemAdapter;
 import com.example.smartcart.ui.shopping.ShoppingViewModel;
 
@@ -37,6 +39,7 @@ import me.aflak.bluetooth.Bluetooth;
 public class HomeFragment extends Fragment {
 
     private ShoppingViewModel shoppingViewModel;
+    private NotShoppingViewModel notShoppingViewModel;
     private ShoppingListAdapter adapter;
     private Bluetooth bluetooth;
     private Button startSession;
@@ -46,6 +49,9 @@ public class HomeFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         shoppingViewModel =
                 new ViewModelProvider(requireActivity()).get(ShoppingViewModel.class);
+
+        notShoppingViewModel =
+                new ViewModelProvider(requireActivity()).get(NotShoppingViewModel.class);
 
         this.bluetooth = shoppingViewModel.getBluetooth();
         View root = inflater.inflate(R.layout.fragment_home, container, false);
@@ -61,6 +67,13 @@ public class HomeFragment extends Fragment {
                 shoppingViewModel.startSession();
                 String message = "rs: Resetting VGA display";
                 shoppingViewModel.getBluetooth().send(String.format("%02d", message.length()) + message); // reset display
+
+
+                ShoppingListItem nextShoppingItem = notShoppingViewModel.getNextPathedItem();
+                if (nextShoppingItem != null) {
+                    int pathedBarcodeLength = 3 + nextShoppingItem.getBarcode().length();
+                    notShoppingViewModel.getBluetooth().send(String.format("%02d", pathedBarcodeLength) + "ps:" + nextShoppingItem.getBarcode());
+                }
 
                 Toast.makeText(getActivity(), "Session started", Toast.LENGTH_SHORT).show();
             }

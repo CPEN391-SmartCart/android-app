@@ -1,6 +1,8 @@
 package com.example.smartcart.ui.shopping;
 
 import java.math.BigDecimal;
+import java.util.UUID;
+
 import com.example.smartcart.ui.search.SearchItem;
 
 /**
@@ -14,6 +16,7 @@ public class ShoppingListItem {
     private final BigDecimal price;
     private BigDecimal totalPrice;
     private BigDecimal weight;
+    private UUID uuid;
 
     public ShoppingListItem(int quantity, String itemName, double price) {
         this.quantity = quantity;
@@ -22,6 +25,7 @@ public class ShoppingListItem {
         this.totalPrice = this.price.multiply(new BigDecimal(quantity));
         this.totalPrice = this.totalPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
         this.weight = new BigDecimal("0.0");
+        this.uuid = UUID.randomUUID();
     }
 
     public ShoppingListItem(int quantity, String itemName, BigDecimal price) {
@@ -31,6 +35,7 @@ public class ShoppingListItem {
         this.totalPrice = this.price.multiply(new BigDecimal(quantity));
         this.totalPrice = this.totalPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
         this.weight = new BigDecimal("0.0");
+        this.uuid = UUID.randomUUID();
     }
 
     public ShoppingListItem(double weight, String itemName, double price) {
@@ -41,6 +46,7 @@ public class ShoppingListItem {
         this.weight = new BigDecimal(weight).setScale(2, BigDecimal.ROUND_HALF_UP);
         this.totalPrice = this.price.multiply(this.weight);
         this.totalPrice = this.totalPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
+        this.uuid = UUID.randomUUID();
     }
 
     public ShoppingListItem(int quantity, SearchItem searchitem) {
@@ -51,6 +57,7 @@ public class ShoppingListItem {
         this.totalPrice = this.price.multiply(new BigDecimal(quantity));
         this.totalPrice = this.totalPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
         this.weight = new BigDecimal("0.0");
+        this.uuid = UUID.randomUUID();
     }
 
     public Integer getQuantity() {
@@ -78,5 +85,9 @@ public class ShoppingListItem {
     }
     public BigDecimal getWeight() {
         return weight;
+    }
+
+    public UUID getUUID() {
+        return uuid;
     }
 }

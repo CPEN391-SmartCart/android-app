@@ -24,6 +24,15 @@ public class ShoppingListItem {
         this.weight = new BigDecimal("0.0");
     }
 
+    public ShoppingListItem(int quantity, String itemName, BigDecimal price, double weight) {
+        this.quantity = quantity;
+        this.itemName = itemName;
+        this.price = price;
+        this.totalPrice = this.price.multiply(new BigDecimal(quantity));
+        this.totalPrice = this.totalPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
+        this.weight = new BigDecimal("0.0");
+    }
+
     public ShoppingListItem(int quantity, SearchItem searchitem) {
         this.quantity = quantity;
         this.itemName = searchitem.getName();

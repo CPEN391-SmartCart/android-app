@@ -30,6 +30,7 @@ import com.example.smartcart.ui.search.SearchItem;
 import com.example.smartcart.ui.search.SearchItemAdapter;
 import com.example.smartcart.ui.shopping.ShoppingList;
 import com.example.smartcart.ui.shopping.ShoppingListAdapter;
+import com.example.smartcart.ui.shopping.ShoppingListItem;
 import com.example.smartcart.ui.shopping.ShoppingListItemAdapter;
 import com.example.smartcart.ui.shopping.ShoppingViewModel;
 
@@ -37,6 +38,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
@@ -93,7 +95,7 @@ public class StatsFragment extends Fragment {
                             JSONArray items = new JSONArray(response);
                             for (int i = 0; i < items.length(); i++) {
                                 JSONObject item = items.getJSONObject(i);
-                                topItems.add(new StatsItem(item.getString("name"), item.getInt("sum")));
+                                topItems.add(new StatsItem(item.getString("name"), item.getInt("sum"), item.getDouble("cost")));
                             }
                             topItemsAdapter.refreshList(topItems);
                             topItemsAdapter.notifyDataSetChanged();

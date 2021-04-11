@@ -8,8 +8,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,14 +22,33 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.smartcart.HomeActivity;
 import com.example.smartcart.R;
+import com.example.smartcart.ui.shopping.ShoppingListItem;
 import com.example.smartcart.ui.shopping.ShoppingListItemAdapter;
+import com.example.smartcart.ui.stats.StatsItem;
+import com.example.smartcart.ui.stats.StatsItemAdapter;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 public class NotShoppingFragment extends Fragment {
 
     private NotShoppingViewModel notShoppingViewModel;
     private ShoppingListItemAdapter adapter;
+    ArrayList<StatsItem> topItems = new ArrayList<>();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -57,17 +78,64 @@ public class NotShoppingFragment extends Fragment {
         // for adding App Bar button
         setHasOptionsMenu(true);
 
-        //display shortest path
-        Button displayPath = root.findViewById(R.id.displayPath);
-//        displayPath.setOnClickListener(v -> {
-//            HomeActivity.btt.write("pp:"+notShoppingViewModel.getNextItem());
-//        });
         //Knapsack
         Button knapsack = root.findViewById(R.id.knapsack);
+        EditText budgetInput = root.findViewById(R.id.budgetInput);
         knapsack.setOnClickListener(v -> {
-            //TODO: bluetooth call de1 to hw accel knapsack
+            try{
+                Double budgetAmount  = Double.parseDouble(budgetInput.getText().toString());
+                executeKnapsackAlgorithm(budgetAmount);
+            }catch(NumberFormatException e){
+                Toast.makeText(getContext(), "Invalid budget input", Toast.LENGTH_SHORT).show();
+            }
         });
+        getStats();
         return root;
+    }
+
+    public void getStats() {
+        RequestQueue queue = Volley.newRequestQueue(requireActivity());
+        String url ="https://cpen391-smartcart.herokuapp.com/stats/frequency?"+"googleId=" + ((HomeActivity) getActivity()).getGoogleId() + "&N=5" ;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray items = new JSONArray(response);
+                            for (int i = 0; i < items.length(); i++) {
+                                JSONObject item = items.getJSONObject(i);
+                                topItems.add(new StatsItem(item.getString("name"), item.getInt("sum"), item.getDouble("cost")));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println(error);
+            }
+        });
+
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, 5, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest);
+    }
+
+    public void executeKnapsackAlgorithm(Double budgetAmount){
+        BigDecimal budgetRemaining = new BigDecimal(budgetAmount).setScale(2, BigDecimal.ROUND_HALF_UP);
+        topItems.sort((StatsItem i1, StatsItem i2)->i2.getCount()-i1.getCount());
+        for(StatsItem item : topItems){
+            BigDecimal cost = item.getCost();
+            if(cost.compareTo(budgetRemaining)<0){
+                notShoppingViewModel.addShoppingListItem(new ShoppingListItem(1, item.getName(),item.getCost(),0.0));
+                budgetRemaining = budgetRemaining.subtract(cost);
+            }
+        }
+        adapter.refreshList(notShoppingViewModel.getShoppingList().getValue());
+        adapter.notifyDataSetChanged();
     }
 
     /**

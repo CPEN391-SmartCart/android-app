@@ -27,7 +27,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.smartcart.items.BarcodeUUID;
 import com.example.smartcart.ui.camera.CameraActivity;
 import com.example.smartcart.ui.not_shopping.NotShoppingViewModel;
 import com.example.smartcart.ui.search.SearchItem;
@@ -42,7 +41,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -126,7 +124,7 @@ public class HomeActivity extends AppCompatActivity {
                     bluetooth.send(String.format("%02d", length) + "sc:" + barcode);
                     navController.navigate(R.id.navigation_shopping);
 
-                    notShoppingViewModel.addScannedItem(new BarcodeUUID(barcode, UUID.randomUUID()));
+                    notShoppingViewModel.addScannedBarcode(barcode);
                     ShoppingListItem shoppingListItem = notShoppingViewModel.getNextPathedItem();
                     if (shoppingListItem != null)
                     {

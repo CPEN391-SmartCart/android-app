@@ -24,40 +24,11 @@
             android:gravity="center"
             android:text="@string/most_purchased_items" />
 
-        <LinearLayout
+        <com.github.mikephil.charting.charts.BarChart
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="6"
-                android:layout_marginStart="4dp"
-                android:text="@string/item" />
-
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="4dp"
-                android:text="@string/amount" />
-
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/price" />
-        </LinearLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/topItems"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="5" />
+            android:layout_height="300dp"
+            android:id="@+id/bargraph">
+        </com.github.mikephil.charting.charts.BarChart>
 
         <TextView
             android:id="@+id/text_receipts"

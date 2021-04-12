@@ -1,6 +1,7 @@
 package com.example.smartcart.ui.stats;
 
 import android.app.AlertDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Layout;
 import android.view.LayoutInflater;
@@ -33,11 +34,17 @@ import com.example.smartcart.ui.shopping.ShoppingListAdapter;
 import com.example.smartcart.ui.shopping.ShoppingListItem;
 import com.example.smartcart.ui.shopping.ShoppingListItemAdapter;
 import com.example.smartcart.ui.shopping.ShoppingViewModel;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -48,20 +55,29 @@ public class StatsFragment extends Fragment {
     ShoppingListAdapter historyAdapter;
     ArrayList<StatsItem> topItems = new ArrayList<>();
 
+    private BarChart barChart;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         ShoppingViewModel shoppingViewModel = new ViewModelProvider(requireActivity()).get(ShoppingViewModel.class);
         View root = inflater.inflate(R.layout.fragment_stats, container, false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
 
-        //setup top 10 items recyclerview
-        RecyclerView topItemsRecycler = root.findViewById(R.id.topItems);
-        topItemsRecycler.addItemDecoration(new DividerItemDecoration(getActivity().getApplicationContext(),
-                DividerItemDecoration.VERTICAL));
+        //setup top 10 items in bargraph
+        barChart = (BarChart) root.findViewById(R.id.bargraph);
+        barChart.setTouchEnabled(false);
+        barChart.setDragEnabled(false);
+        barChart.setScaleEnabled(false);
+        barChart.setDescription("");
+
+//        //setup top 10 items recyclerview
+//        RecyclerView topItemsRecycler = root.findViewById(R.id.topItems);
+//        topItemsRecycler.addItemDecoration(new DividerItemDecoration(getActivity().getApplicationContext(),
+//                DividerItemDecoration.VERTICAL));
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        topItemsRecycler.setLayoutManager(layoutManager);
+//        topItemsRecycler.setLayoutManager(layoutManager);
         topItemsAdapter = new StatsItemAdapter(getActivity().getApplicationContext(), topItems);
-        topItemsRecycler.setAdapter(topItemsAdapter);
+//        topItemsRecycler.setAdapter(topItemsAdapter);
 
         // set up recycler for shopping list histories
         RecyclerView historyRecycler = root.findViewById(R.id.history);
@@ -99,10 +115,26 @@ public class StatsFragment extends Fragment {
                             }
                             topItemsAdapter.refreshList(topItems);
                             topItemsAdapter.notifyDataSetChanged();
+
+                            // bar graph
+                            ArrayList<BarEntry> barEntries = new ArrayList<>();
+                            ArrayList<String> barNames = new ArrayList<>();
+
+                            for (int i = 0; i < topItems.size(); i++){
+                                barEntries.add(new BarEntry(topItems.get(i).getCount(), i));
+                                barNames.add(topItems.get(i).getName());
+                            }
+
+                            BarDataSet barDataSet = new BarDataSet(barEntries, "Item Names");
+                            barDataSet.setColor(Color.rgb(115, 50, 207));
+
+                            BarData theData = new BarData(barNames, barDataSet);
+                            barChart.setData(theData);
+                            barChart.invalidate();
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                     }
                 }, new Response.ErrorListener() {
             @Override

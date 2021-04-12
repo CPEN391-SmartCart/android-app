@@ -16,7 +16,7 @@
 
         <Button
             android:id="@+id/smartcart_connect"
-            android:layout_width="328dp"
+            android:layout_width="326dp"
             android:layout_height="wrap_content"
             android:text="Connect to SmartCart"
             android:textAlignment="center"

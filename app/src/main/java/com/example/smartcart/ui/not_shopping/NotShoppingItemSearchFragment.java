@@ -27,6 +27,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.smartcart.HomeActivity;
 import com.example.smartcart.R;
+import com.example.smartcart.ui.shopping.ShoppingListItem;
 import com.example.smartcart.ui.shopping.ShoppingQuantityDialogFragment;
 import com.example.smartcart.ui.search.SearchItem;
 import com.example.smartcart.ui.search.SearchItemAdapter;
@@ -65,10 +66,14 @@ public class NotShoppingItemSearchFragment extends Fragment {
                 TextView itemName = v.findViewById(R.id.itemName);
                 TextView price = v.findViewById(R.id.price);
                 TextView barcode = v.findViewById(R.id.barcode);
-                notShoppingViewModel.setNextItem(new SearchItem(itemName.getText().toString(), new BigDecimal(price.getText().toString().substring(1)), barcode.getText().toString()));
-
-                NotShoppingQuantityDialogFragment dialog = new NotShoppingQuantityDialogFragment();
-                dialog.show(getParentFragmentManager(), "NotShoppingQuantityDialogFragment");
+                notShoppingViewModel.setNextItem(new SearchItem(itemName.getText().toString(), new BigDecimal(price.getText().toString().replace("/kg", "").substring(1)), barcode.getText().toString(), false));
+                if (price.getText().toString().endsWith("/kg")) {
+                    notShoppingViewModel.addShoppingListItem(new ShoppingListItem(1, notShoppingViewModel.getNextItem()));
+                    Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_not_shopping_search_to_navigation_not_shopping);
+                } else {
+                    NotShoppingQuantityDialogFragment dialog = new NotShoppingQuantityDialogFragment();
+                    dialog.show(getParentFragmentManager(), "NotShoppingQuantityDialogFragment");
+                }
             }
         };
         item_list = ((HomeActivity) getActivity()).getSearchableItems();

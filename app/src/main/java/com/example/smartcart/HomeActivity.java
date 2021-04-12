@@ -221,7 +221,7 @@ public class HomeActivity extends AppCompatActivity {
                             JSONArray items = new JSONArray(response);
                             for (int i = 0; i < items.length(); i++) {
                                 JSONObject item = items.getJSONObject(i);
-                                searchableItems.add(new SearchItem(item.getString("name"), item.getDouble("cost"), item.getString("barcode")));
+                                searchableItems.add(new SearchItem(item.getString("name"), item.getDouble("cost"), item.getString("barcode"), item.getInt("requires_weighing") == 1));
                             }
 
                         } catch (JSONException e) {
@@ -253,6 +253,12 @@ public class HomeActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction().replace(R.id.nav_host_fragment, ShoppingFragment.class, null).addToBackStack("").commit();
         } else {
             super.onBackPressed();
+        }
+
+        if(bluetooth.isConnected()) {
+            shoppingViewModel.getBluetoothButton().setText("Connected");
+        } else {
+            shoppingViewModel.getBluetoothButton().setText("Retry");
         }
     }
 

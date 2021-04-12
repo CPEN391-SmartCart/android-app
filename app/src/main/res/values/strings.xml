@@ -29,4 +29,14 @@
     <string name="scan">Scan</string>
     <string name="most_purchased_items"><b>Most Purchased Items</b></string>
     <string name="history"><b>History</b></string>
+    <string name="time"><b>Time</b></string>
+    <string name="date"><b>Date</b></string>
+    <string name="total_price"><b>Total Price</b></string>
+
+    <string name="item"><b>Item</b></string>
+    <string name="amount"><b>Amount</b></string>
+    <string name="price"><b>Price</b></string>
+    <string name="weight"><b>Weight</b></string>
+    <string name="qty"><b>Qty</b></string>
+    <string name="delete"><b>Delete</b></string>
 </resources>

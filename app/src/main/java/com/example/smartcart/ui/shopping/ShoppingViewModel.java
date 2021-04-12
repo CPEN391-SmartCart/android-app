@@ -117,15 +117,26 @@ public class ShoppingViewModel extends ViewModel {
     public void sortHistory() {
         ArrayList<ShoppingList> temp_history = new ArrayList<>(history.getValue());
         temp_history.sort((o1, o2) -> {
-            String[] date1 = o1.getPurchaseDate().split("-");
-            String[] date2 = o2.getPurchaseDate().split("-");
-            for (int i = 2; i > -1; i--) {
+            String[] date1 = o1.getPurchaseDate().substring(0, 10).split("-");
+            String[] date2 = o2.getPurchaseDate().substring(0, 10).split("-");
+            for (int i = 0; i < 3; i++) {
                 if (Integer.parseInt(date1[i]) > Integer.parseInt(date2[i])) {
                     return -1;
-                } else if (Integer.parseInt(date1[i]) > Integer.parseInt(date2[i])) {
+                } else if (Integer.parseInt(date2[i]) > Integer.parseInt(date1[i])) {
                     return 1;
                 }
             }
+
+            String[] time1 = o1.getPurchaseDate().substring(11, 16).split(":");
+            String[] time2 = o2.getPurchaseDate().substring(11, 16).split(":");
+            for (int i = 0; i < 2; i++) {
+                if (Integer.parseInt(time1[i]) > Integer.parseInt(time2[i])) {
+                    return -1;
+                } else if (Integer.parseInt(time2[i]) > Integer.parseInt(time1[i])) {
+                    return 1;
+                }
+            }
+
             return 0;
         });
         history.setValue(new ArrayList<>(temp_history));

@@ -26,7 +26,7 @@ public class ShoppingList {
         this.subtotal = new BigDecimal(String.valueOf(subtotal)).setScale(2, BigDecimal.ROUND_HALF_UP);
         this.gst = this.subtotal.multiply(BigDecimal.valueOf(0.05)).setScale(2, BigDecimal.ROUND_HALF_UP);;
         this.totalPrice = this.subtotal.add(gst);
-        this.purchaseDate = purchaseDate.substring(0, 10);
+        this.purchaseDate = purchaseDate;
         this.name = "ShoppingList";
     }
 

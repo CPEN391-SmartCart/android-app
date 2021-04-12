@@ -256,6 +256,12 @@ public class HomeActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
+
+        if(bluetooth.isConnected()) {
+            shoppingViewModel.getBluetoothButton().setText("Connected");
+        } else {
+            shoppingViewModel.getBluetoothButton().setText("Retry");
+        }
     }
 
     @Override

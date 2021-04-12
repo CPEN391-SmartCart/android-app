@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -126,16 +127,33 @@ public class NotShoppingFragment extends Fragment {
 
     public void executeKnapsackAlgorithm(Double budgetAmount){
         BigDecimal budgetRemaining = new BigDecimal(budgetAmount).setScale(2, BigDecimal.ROUND_HALF_UP);
-        topItems.sort((StatsItem i1, StatsItem i2)->i2.getCount()-i1.getCount());
-        for(StatsItem item : topItems){
-            BigDecimal cost = item.getCost();
-            if(cost.compareTo(budgetRemaining)<0){
-                notShoppingViewModel.addShoppingListItem(new ShoppingListItem(1, item.getName(),item.getCost(),0.0));
-                budgetRemaining = budgetRemaining.subtract(cost);
-            }
+        ArrayList<StatsItem> itemsToAdd = new ArrayList<>(topItems);
+        BigDecimal shoppingListCost = new BigDecimal(0.0);
+        for (ShoppingListItem item: notShoppingViewModel.getShoppingList().getValue()){
+            itemsToAdd.removeIf(n -> (n.getName().equals(item.getItemName())));
+            shoppingListCost = shoppingListCost.add(item.getTotalPrice());
         }
-        adapter.refreshList(notShoppingViewModel.getShoppingList().getValue());
-        adapter.notifyDataSetChanged();
+        budgetRemaining = budgetRemaining.subtract(shoppingListCost);
+
+        if(budgetRemaining.compareTo(new BigDecimal(0.0)) < 0){
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity())
+                    .setTitle("Error")
+                    .setMessage("Shopping list cost already exceeds budget! Please remove some items!");
+            builder.setPositiveButton("Understood", null);
+            builder.create().show();
+        }
+        else {
+            itemsToAdd.sort((StatsItem i1, StatsItem i2) -> i2.getCount() - i1.getCount());
+            for (StatsItem item : itemsToAdd) {
+                BigDecimal cost = item.getCost();
+                if (cost.compareTo(budgetRemaining) < 0) {
+                    notShoppingViewModel.addShoppingListItem(new ShoppingListItem(1, item.getName(), item.getCost(), 0.0));
+                    budgetRemaining = budgetRemaining.subtract(cost);
+                }
+            }
+            adapter.refreshList(notShoppingViewModel.getShoppingList().getValue());
+            adapter.notifyDataSetChanged();
+        }
     }
 
     /**

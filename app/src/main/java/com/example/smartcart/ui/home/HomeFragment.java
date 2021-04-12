@@ -63,19 +63,28 @@ public class HomeFragment extends Fragment {
         shoppingViewModel.setBluetoothButton(bluetoothButton);
 
         startSession.setOnClickListener(v -> {
-            shoppingViewModel.startSession();
-            if (shoppingViewModel.getBluetooth().getBluetoothAdapter() != null && shoppingViewModel.getBluetooth().isConnected()) { //TODO: check for bluetooth connection
-                String message = "rs: Resetting VGA display";
-                shoppingViewModel.getBluetooth().send(String.format("%02d", message.length()) + message); // reset display
+            if(bluetooth.isConnected()) {
+                shoppingViewModel.startSession();
+                if (shoppingViewModel.getBluetooth().getBluetoothAdapter() != null) { //TODO: check for bluetooth connection
+                    String message = "rs: Resetting VGA display";
+                    shoppingViewModel.getBluetooth().send(String.format("%02d", message.length()) + message); // reset display
 
 
-                ShoppingListItem nextShoppingItem = notShoppingViewModel.getNextPathedItem();
-                if (nextShoppingItem != null) {
-                    int pathedBarcodeLength = 3 + nextShoppingItem.getBarcode().length();
-                    notShoppingViewModel.getBluetooth().send(String.format("%02d", pathedBarcodeLength) + "ps:" + nextShoppingItem.getBarcode());
+                    ShoppingListItem nextShoppingItem = notShoppingViewModel.getNextPathedItem();
+                    if (nextShoppingItem != null) {
+                        int pathedBarcodeLength = 3 + nextShoppingItem.getBarcode().length();
+                        notShoppingViewModel.getBluetooth().send(String.format("%02d", pathedBarcodeLength) + "ps:" + nextShoppingItem.getBarcode());
+                    }
+
+                    Toast.makeText(getActivity(), "Session started", Toast.LENGTH_SHORT).show();
                 }
-
-                Toast.makeText(getActivity(), "Session started", Toast.LENGTH_SHORT).show();
+            } else {
+                new AlertDialog.Builder(this.getActivity())
+                        .setTitle("Error")
+                        .setMessage("You must first connect to a SmartCart")
+                        .setNegativeButton("Understood", null)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
             }
         });
 

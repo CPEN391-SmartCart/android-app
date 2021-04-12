@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
 
@@ -55,10 +54,8 @@ public class NotShoppingQuantityDialogFragment extends DialogFragment {
                             @SuppressLint("DefaultLocale")
                             public void onClick(DialogInterface dialog,
                                                 int id) {
-                                Log.d("TESTING", "TESAPOFKAWEFA");
                                 if (notShoppingViewModel.getNextPathedItem() == null && shoppingViewModel.isSessionActive().getValue())
                                 {
-                                    Log.d("TESTING", notShoppingViewModel.getNextPathedItem().getItemName());
                                     int pathedBarcodeLength = 3 + notShoppingViewModel.getNextItem().getBarcode().length();
                                     notShoppingViewModel.getBluetooth().send(String.format("%02d", pathedBarcodeLength) + "ps:" + notShoppingViewModel.getNextItem().getBarcode());
                                 }

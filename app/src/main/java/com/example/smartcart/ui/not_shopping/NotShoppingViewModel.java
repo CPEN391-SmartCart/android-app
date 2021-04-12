@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.smartcart.items.BarcodeUUID;
 import com.example.smartcart.ui.search.SearchItem;
 import com.example.smartcart.ui.shopping.ShoppingList;
 import com.example.smartcart.ui.shopping.ShoppingListItem;
@@ -16,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import me.aflak.bluetooth.Bluetooth;
 
@@ -27,14 +25,14 @@ public class NotShoppingViewModel extends ViewModel {
     private Set<String> itemNames;
     public  MutableLiveData<BigDecimal> total;
     private MutableLiveData<SearchItem> nextItem;
-    private Set<BarcodeUUID> scannedItems;
+    private Set<String> scannedBarcodes;
     private Bluetooth bluetooth;
 
     public NotShoppingViewModel() {
         shoppingList = new MutableLiveData<>();
         shoppingList.setValue(new ArrayList<>());
         itemNames = new HashSet<>();
-        scannedItems = new HashSet<>();
+        scannedBarcodes = new HashSet<>();
         total = new MutableLiveData<>();
         total.setValue(new BigDecimal("0.00"));
 
@@ -52,16 +50,16 @@ public class NotShoppingViewModel extends ViewModel {
 
     public LiveData<ArrayList<ShoppingListItem>> getShoppingList() { return shoppingList; }
 
-    public void addScannedItem(BarcodeUUID item)
+    public void addScannedBarcode(String scannedBarcode)
     {
-        this.scannedItems.add(item);
+        this.scannedBarcodes.add(scannedBarcode);
     }
 
     public ShoppingListItem getNextPathedItem()
     {
         for (ShoppingListItem shoppingListItem : shoppingList.getValue())
         {
-            if (!scannedItems.contains(new BarcodeUUID(shoppingListItem.getBarcode(), shoppingListItem.getUUID())))
+            if (!scannedBarcodes.contains(shoppingListItem.getBarcode()))
             {
                 return shoppingListItem;
             }
@@ -108,5 +106,24 @@ public class NotShoppingViewModel extends ViewModel {
     }
 
     private void initShoppingList() {
+
+//        addShoppingListItem(new ShoppingListItem(1, "Pickles", 9.90));
+//        addShoppingListItem(new ShoppingListItem(1, "Mayo", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Bread", 1.99));
+//        addShoppingListItem(new ShoppingListItem(2, "Cheese", 1.99));
+//        addShoppingListItem(new ShoppingListItem(3, "Mountain Dew", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Chug Jug", 9.90));
+//        addShoppingListItem(new ShoppingListItem(1, "Mayo", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Bread", 1.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Cheese", 1.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Mountain Dew", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Pickles", 9.90));
+//        addShoppingListItem(new ShoppingListItem(1, "Mayo", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Bread", 1.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Cheese", 1.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Mountain Dew", 3.99));
+//        addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
     }
 }

@@ -27,7 +27,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.smartcart.items.BarcodeUUID;
 import com.example.smartcart.ui.camera.CameraActivity;
+import com.example.smartcart.ui.not_shopping.NotShoppingViewModel;
 import com.example.smartcart.ui.search.SearchItem;
 import com.example.smartcart.ui.shopping.ShoppingFragment;
 import com.example.smartcart.ui.shopping.ShoppingItemSearchFragment;
@@ -54,6 +56,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private final ArrayList<SearchItem> searchableItems = new ArrayList<>();
     ShoppingViewModel shoppingViewModel;
+    NotShoppingViewModel notShoppingViewModel;
     String googleId;
     RequestQueue queue;
 
@@ -65,6 +68,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         googleId = getIntent().getStringExtra("googleId");
         shoppingViewModel = new ViewModelProvider(this).get(ShoppingViewModel.class);
+        notShoppingViewModel = new ViewModelProvider(this).get(NotShoppingViewModel.class);
         queue = Volley.newRequestQueue(this);
 
         setContentView(R.layout.activity_home);
@@ -121,6 +125,19 @@ public class HomeActivity extends AppCompatActivity {
                     Log.d("BARCODE", bluetooth.toString());
                     bluetooth.send(String.format("%02d", length) + "sc:" + barcode);
                     navController.navigate(R.id.navigation_shopping);
+
+                    notShoppingViewModel.addScannedItem(new BarcodeUUID(barcode, UUID.randomUUID()));
+                    ShoppingListItem shoppingListItem = notShoppingViewModel.getNextPathedItem();
+                    if (shoppingListItem != null)
+                    {
+                        int pathedBarcodeLength = 3 + shoppingListItem.getBarcode().length();
+                        bluetooth.send(String.format("%02d", pathedBarcodeLength) + "pp:" + shoppingListItem.getBarcode());
+                    }
+                    else
+                    {
+                        int pathedBarcodeLength = 3 + 4;
+                        bluetooth.send(String.format("%02d", pathedBarcodeLength) + "pc:ggez");
+                    }
                 }
             }
         }
@@ -266,6 +283,7 @@ public class HomeActivity extends AppCompatActivity {
         bluetooth = new Bluetooth(this);
         bluetooth.setDeviceCallback(deviceCallback);
         shoppingViewModel.setBluetooth(bluetooth);
+        notShoppingViewModel.setBluetooth(bluetooth);
     }
 
     @Override
@@ -286,6 +304,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private DeviceCallback deviceCallback = new DeviceCallback() {
+        @SuppressLint("DefaultLocale")
         @Override
         public void onDeviceConnected(BluetoothDevice device) {
             //Toast.makeText(HomeActivity.this, "Connected to: " + device + "!", Toast.LENGTH_LONG).show();

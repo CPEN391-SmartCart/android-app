@@ -1,9 +1,11 @@
 package com.example.smartcart.ui.not_shopping;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
 
@@ -22,12 +24,14 @@ public class NotShoppingQuantityDialogFragment extends DialogFragment {
 
 
     private NotShoppingViewModel notShoppingViewModel;
+    private ShoppingViewModel shoppingViewModel;
     private NumberPicker aNumberPicker;
 
     @NotNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         notShoppingViewModel = new ViewModelProvider(requireActivity()).get(NotShoppingViewModel.class);
+        shoppingViewModel = new ViewModelProvider(requireActivity()).get(ShoppingViewModel.class);
 
         RelativeLayout linearLayout = new RelativeLayout(requireActivity());
         aNumberPicker = new NumberPicker(requireActivity());
@@ -48,8 +52,16 @@ public class NotShoppingQuantityDialogFragment extends DialogFragment {
         alertDialogBuilder
                 .setPositiveButton("Ok",
                         new DialogInterface.OnClickListener() {
+                            @SuppressLint("DefaultLocale")
                             public void onClick(DialogInterface dialog,
                                                 int id) {
+                                Log.d("TESTING", "TESAPOFKAWEFA");
+                                if (notShoppingViewModel.getNextPathedItem() == null && shoppingViewModel.isSessionActive().getValue())
+                                {
+                                    Log.d("TESTING", notShoppingViewModel.getNextPathedItem().getItemName());
+                                    int pathedBarcodeLength = 3 + notShoppingViewModel.getNextItem().getBarcode().length();
+                                    notShoppingViewModel.getBluetooth().send(String.format("%02d", pathedBarcodeLength) + "ps:" + notShoppingViewModel.getNextItem().getBarcode());
+                                }
                                 notShoppingViewModel.addShoppingListItem(new ShoppingListItem(aNumberPicker.getValue(), notShoppingViewModel.getNextItem()));
                                 Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_not_shopping_search_to_navigation_not_shopping);
                             }

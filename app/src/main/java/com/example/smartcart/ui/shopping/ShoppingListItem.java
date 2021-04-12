@@ -1,6 +1,8 @@
 package com.example.smartcart.ui.shopping;
 
 import java.math.BigDecimal;
+import java.util.UUID;
+
 import com.example.smartcart.ui.search.SearchItem;
 
 /**
@@ -14,6 +16,7 @@ public class ShoppingListItem {
     private final BigDecimal price;
     private BigDecimal totalPrice;
     private BigDecimal weight;
+    private UUID uuid;
 
     public ShoppingListItem(int quantity, String itemName, double price, double weight) {
         this.quantity = quantity;
@@ -22,6 +25,7 @@ public class ShoppingListItem {
         this.totalPrice = this.price.multiply(new BigDecimal(quantity));
         this.totalPrice = this.totalPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
         this.weight = new BigDecimal("0.0");
+        this.uuid = UUID.randomUUID();
     }
 
     public ShoppingListItem(int quantity, String itemName, BigDecimal price, double weight) {
@@ -31,6 +35,7 @@ public class ShoppingListItem {
         this.totalPrice = this.price.multiply(new BigDecimal(quantity));
         this.totalPrice = this.totalPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
         this.weight = new BigDecimal("0.0");
+        this.uuid = UUID.randomUUID();
     }
 
     public ShoppingListItem(int quantity, SearchItem searchitem) {
@@ -41,6 +46,7 @@ public class ShoppingListItem {
         this.totalPrice = this.price.multiply(new BigDecimal(quantity));
         this.totalPrice = this.totalPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
         this.weight = new BigDecimal("0.0");
+        this.uuid = UUID.randomUUID();
     }
 
     public Integer getQuantity() {
@@ -68,5 +74,9 @@ public class ShoppingListItem {
     }
     public BigDecimal getWeight() {
         return weight;
+    }
+
+    public UUID getUUID() {
+        return uuid;
     }
 }

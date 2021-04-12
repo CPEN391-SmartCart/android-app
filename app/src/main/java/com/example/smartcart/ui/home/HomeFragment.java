@@ -58,7 +58,7 @@ public class HomeFragment extends Fragment {
 
         startSession.setOnClickListener(v -> {
             shoppingViewModel.startSession();
-            if (shoppingViewModel.getBluetooth().getBluetoothAdapter() != null) { //TODO: check for bluetooth connection
+            if (shoppingViewModel.getBluetooth().getBluetoothAdapter() != null && shoppingViewModel.getBluetooth().isConnected()) { //TODO: check for bluetooth connection
                 String message = "rs: Resetting VGA display";
                 shoppingViewModel.getBluetooth().send(String.format("%02d", message.length()) + message); // reset display
 

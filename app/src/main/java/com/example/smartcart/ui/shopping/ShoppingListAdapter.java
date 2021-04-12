@@ -41,9 +41,9 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
 
     @Override
     public void onBindViewHolder(ShoppingListViewHolder holder, int position) {
-        holder.name.setText(String.format("%s", history.get(position).getName()));
+        holder.date.setText(String.format("%s", history.get(position).getPurchaseDate().substring(0, 10)));
+        holder.time.setText(String.format("%s", history.get(position).getPurchaseDate().substring(11, 16)));
         holder.price.setText(String.format("$%s", history.get(position).getTotalPrice()));
-        holder.date.setText(String.format("%s", history.get(position).getPurchaseDate()));
         holder.layout.setOnClickListener(v -> {
             AlertDialog.Builder receiptItemDialogBuilder = new AlertDialog.Builder(activity)
                     .setTitle("Items in Shopping List")
@@ -73,16 +73,16 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
 
     public class ShoppingListViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView name;
-        private TextView price;
         private TextView date;
+        private TextView time;
+        private TextView price;
         private LinearLayout layout;
 
         public ShoppingListViewHolder(View itemView) {
             super(itemView);
-            name = (TextView) itemView.findViewById(R.id.name);
-            price = (TextView) itemView.findViewById(R.id.price);
             date = (TextView) itemView.findViewById(R.id.date);
+            time = (TextView) itemView.findViewById(R.id.time);
+            price = (TextView) itemView.findViewById(R.id.price);
             layout = itemView.findViewById(R.id.shopping_list_item_layout);
         }
     }

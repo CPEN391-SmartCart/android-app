@@ -62,7 +62,11 @@ public class SearchItemAdapter extends RecyclerView.Adapter<SearchItemAdapter.Se
         if (filtered_item_list.get(position).getPrice().equals(new BigDecimal("0.0"))) {
             holder.price.setText("");
         } else {
-            holder.price.setText(String.format("$%s", filtered_item_list.get(position).getPrice()));
+            if (filtered_item_list.get(position).requiresWeighing) {
+                holder.price.setText(String.format("$%s/kg", filtered_item_list.get(position).getPrice()));
+            } else {
+                holder.price.setText(String.format("$%s", filtered_item_list.get(position).getPrice()));
+            }
         }
         holder.barcode.setText(filtered_item_list.get(position).getBarcode());
     }

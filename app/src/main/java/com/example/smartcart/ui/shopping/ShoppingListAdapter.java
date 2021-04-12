@@ -45,7 +45,9 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         holder.price.setText(String.format("$%s", history.get(position).getTotalPrice()));
         holder.date.setText(String.format("%s", history.get(position).getPurchaseDate()));
         holder.layout.setOnClickListener(v -> {
-            AlertDialog.Builder receiptItemDialogBuilder = new AlertDialog.Builder(activity);
+            AlertDialog.Builder receiptItemDialogBuilder = new AlertDialog.Builder(activity)
+                    .setTitle("Items in Shopping List")
+                    .setPositiveButton("Ok", null);
             View receiptItemView = inflater.inflate(R.layout.receipt_items_dialog, null);
 
             RecyclerView receiptItems = receiptItemView.findViewById(R.id.receipt_items_recycler);

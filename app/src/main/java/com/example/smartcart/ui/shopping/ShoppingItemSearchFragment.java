@@ -67,10 +67,14 @@ public class ShoppingItemSearchFragment extends Fragment {
                 TextView itemName = v.findViewById(R.id.itemName);
                 TextView price = v.findViewById(R.id.price);
                 TextView barcode = v.findViewById(R.id.barcode);
-                shoppingViewModel.setNextItem(new SearchItem(itemName.getText().toString(), new BigDecimal(price.getText().toString().substring(1)), barcode.getText().toString()));
-
-                ShoppingQuantityDialogFragment dialog = new ShoppingQuantityDialogFragment();
-                dialog.show(getParentFragmentManager(), "ShoppingQuantityDialogFragment");
+                shoppingViewModel.setNextItem(new SearchItem(itemName.getText().toString(), new BigDecimal(price.getText().toString().replace("/kg", "").substring(1)), barcode.getText().toString(), false));
+                if (price.getText().toString().endsWith("/kg")) {
+                    shoppingViewModel.addShoppingListItem(new ShoppingListItem(1, shoppingViewModel.getNextItem()));
+                    Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_shopping_search_to_navigation_shopping);
+                } else {
+                    ShoppingQuantityDialogFragment dialog = new ShoppingQuantityDialogFragment();
+                    dialog.show(getParentFragmentManager(), "ShoppingQuantityDialogFragment");
+                }
             }
         };
         adapter = new SearchItemAdapter(getActivity().getApplicationContext(), item_list, add_item);

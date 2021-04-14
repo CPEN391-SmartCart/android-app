@@ -1,23 +1,23 @@
 package com.example.smartcart.ui.shopping;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.smartcart.R;
-import com.example.smartcart.ui.stats.StatsFragment;
 
 import java.util.ArrayList;
 
+/**
+ * Allows us to display a list of shopping lists
+ */
 public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ShoppingListViewHolder>{
     private LayoutInflater inflater;
     private FragmentActivity activity;
@@ -44,6 +44,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         holder.date.setText(String.format("%s", history.get(position).getPurchaseDate().substring(0, 10)));
         holder.time.setText(String.format("%s", history.get(position).getPurchaseDate().substring(11, 16)));
         holder.price.setText(String.format("$%s", history.get(position).getTotalPrice()));
+        // Creates a dialog to display the items in a selected shopping list
         holder.layout.setOnClickListener(v -> {
             AlertDialog.Builder receiptItemDialogBuilder = new AlertDialog.Builder(activity)
                     .setTitle("Items in Shopping List")
@@ -71,6 +72,9 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         return history.size();
     }
 
+    /**
+     * Represents the layout associated with an entry in the recyclerView
+     */
     public class ShoppingListViewHolder extends RecyclerView.ViewHolder {
 
         private TextView date;

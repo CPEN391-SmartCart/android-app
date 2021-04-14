@@ -39,6 +39,9 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
+/**
+ * Represents the checkout dialog integrated with stripe API
+ */
 public class ShoppingCheckoutDialogFragment extends DialogFragment {
 
     private ShoppingViewModel shoppingViewModel;
@@ -49,15 +52,13 @@ public class ShoppingCheckoutDialogFragment extends DialogFragment {
     private String paymentIntentClientSecret;
     private Stripe stripe;
 
-    /**
-     * USE CARD 4242 4242 4242 4242 WITH ANY DATE IN THE FUTURE ANY CVC AND A 5? DIGIT NUMERICAL POSTAL CODE (US)
-     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         shoppingViewModel = new ViewModelProvider(requireActivity()).get(ShoppingViewModel.class);
         googleId = ((HomeActivity) requireActivity()).getGoogleId();
         queue = Volley.newRequestQueue(requireActivity());
+        //This key is ok to leave in the repository
         stripe = new Stripe(
                 requireContext().getApplicationContext(),
                 "pk_test_51IOeizF8GwWH2Z4EuiD4cCfl7DtLAaK7SA0lVYnSVs4O84LGyr92CwAOhCwIrW2BUt3Xgw3re7Q6Z7WXPCnu5o1A004jK1w6CV"
@@ -65,6 +66,8 @@ public class ShoppingCheckoutDialogFragment extends DialogFragment {
         startCheckout(shoppingViewModel.subtotal.getValue().multiply(new BigDecimal(105)).intValue());
 
         View checkoutView = inflater.inflate(R.layout.checkout_dialog, container, false);
+
+        // Setup Button to finalize checkout
         Button payButton = checkoutView.findViewById(R.id.payButton);
         payButton.setOnClickListener((View view) -> {
             CardInputWidget cardInputWidget = checkoutView.findViewById(R.id.cardInputWidget);
@@ -90,6 +93,9 @@ public class ShoppingCheckoutDialogFragment extends DialogFragment {
         stripe.onPaymentResult(requestCode, data, new PaymentResultCallback());
     }
 
+    /**
+     * Handles the callback from Stripe API
+     */
     private final class PaymentResultCallback
             implements ApiResultCallback<PaymentIntentResult> {
 
@@ -124,6 +130,9 @@ public class ShoppingCheckoutDialogFragment extends DialogFragment {
         }
     }
 
+    /**
+     * Displays an alert with given title and message
+     */
     private void displayAlert(@NonNull String title,
                               @Nullable String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity())
@@ -133,6 +142,11 @@ public class ShoppingCheckoutDialogFragment extends DialogFragment {
         builder.create().show();
     }
 
+    /**
+     * Sends a POST request to the backend server to add a new receipt
+     * Note: this is the beginning to a chain of calls to add a receipt and associated items to the backend
+     * Starting by adding a receipt, we then read the receiptId and add the items in the cart to the backend
+     */
     private void PostReceipt() {
         String url ="https://cpen391-smartcart.herokuapp.com/receipts";
         JSONObject body = new JSONObject();
@@ -175,6 +189,9 @@ public class ShoppingCheckoutDialogFragment extends DialogFragment {
         queue.add(stringRequest);
     }
 
+    /**
+     * Fetches the most recent receipt from the backend
+     */
     private void readReceipt() {
         String url ="https://cpen391-smartcart.herokuapp.com/receipts/id/" + googleId;
 
@@ -207,6 +224,9 @@ public class ShoppingCheckoutDialogFragment extends DialogFragment {
         queue.add(stringRequest);
     }
 
+    /**
+     * Sends a POST request for adding items to a receipt
+     */
     private void postItem(ShoppingListItem item) {
         String url ="https://cpen391-smartcart.herokuapp.com/receipt-items";
         JSONObject body = new JSONObject();
@@ -251,6 +271,10 @@ public class ShoppingCheckoutDialogFragment extends DialogFragment {
         queue.add(stringRequest);
     }
 
+    /**
+     * Initialize a intent to checkout with a certain amount
+     * @param amount - amount to be billed
+     */
     private void startCheckout(int amount) {
         String url ="https://cpen391-smartcart.herokuapp.com/payment";
         JSONObject body = new JSONObject();

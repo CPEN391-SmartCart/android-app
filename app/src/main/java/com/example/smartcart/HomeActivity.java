@@ -13,7 +13,6 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -30,8 +29,6 @@ import com.android.volley.toolbox.Volley;
 import com.example.smartcart.ui.camera.CameraActivity;
 import com.example.smartcart.ui.not_shopping.NotShoppingViewModel;
 import com.example.smartcart.ui.search.SearchItem;
-import com.example.smartcart.ui.shopping.ShoppingFragment;
-import com.example.smartcart.ui.shopping.ShoppingItemSearchFragment;
 import com.example.smartcart.ui.shopping.ShoppingList;
 import com.example.smartcart.ui.shopping.ShoppingListItem;
 import com.example.smartcart.ui.shopping.ShoppingViewModel;
@@ -42,31 +39,31 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 import me.aflak.bluetooth.Bluetooth;
 import me.aflak.bluetooth.interfaces.DeviceCallback;
 
+/**
+ * The main activity of the app. Is the parent to many fragments
+ */
 public class HomeActivity extends AppCompatActivity {
-    private static final String BT_TAG = "MY_APP_DEBUG_TAG";
-    private static final int REQUEST_ENABLE_BT = 1;
-    private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
-    private final ArrayList<SearchItem> searchableItems = new ArrayList<>();
-    ShoppingViewModel shoppingViewModel;
-    NotShoppingViewModel notShoppingViewModel;
-    String googleId;
-    RequestQueue queue;
+    private ShoppingViewModel shoppingViewModel;
+    private NotShoppingViewModel notShoppingViewModel;
+    private String googleId;
+    private RequestQueue queue;
 
     private NavController navController;
     private Bluetooth bluetooth;
 
+    private final ArrayList<SearchItem> searchableItems = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        googleId = getIntent().getStringExtra("googleId");
         shoppingViewModel = new ViewModelProvider(this).get(ShoppingViewModel.class);
         notShoppingViewModel = new ViewModelProvider(this).get(NotShoppingViewModel.class);
+        googleId = getIntent().getStringExtra("googleId");
         queue = Volley.newRequestQueue(this);
 
         setContentView(R.layout.activity_home);
@@ -107,6 +104,9 @@ public class HomeActivity extends AppCompatActivity {
         initializeReceipts();
     }
 
+    /**
+     * Handles
+     */
     @SuppressLint("DefaultLocale")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -141,10 +141,16 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * returns the googld id of the currently logged in user
+     */
     public String getGoogleId() {
         return googleId;
     }
 
+    /**
+     * Fetches the receipts of the logged in user for later use in the stats fragment
+     */
     private void initializeReceipts() {
         String url ="https://cpen391-smartcart.herokuapp.com/receipts/" + googleId;
 
@@ -153,6 +159,7 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         try {
+                            //Parses the json response
                             JSONArray resp = new JSONArray(response);
                             for (int i = 0; i < resp.length(); i++) {
                                 JSONObject receipt = resp.getJSONObject(i);
@@ -175,6 +182,9 @@ public class HomeActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
 
+    /**
+     * Helper function to initialize receipts as we have to get the items of each receipt
+     */
     private void initializeReceiptItems(String receiptId, Double subtotal, String purchaseDate) {
         String url ="https://cpen391-smartcart.herokuapp.com/receipt-items/" + receiptId;
 
@@ -183,6 +193,7 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         try {
+                            //Parse json and add to viewmodel
                             JSONArray items = new JSONArray(response);
                             ArrayList<ShoppingListItem> shoppingListItems = new ArrayList<>();
                             for (int i = 0; i < items.length(); i++) {
@@ -208,6 +219,9 @@ public class HomeActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
 
+    /**
+     * Fetches the items of the store that we are currently at so that we may search and plan with them
+     */
     private void initializeSearchableItems() {
         //call database to populate searchable items
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -241,20 +255,18 @@ public class HomeActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
 
+    /**
+     * Returns the searchable items of the current store
+     */
     public ArrayList<SearchItem> getSearchableItems() {
         return new ArrayList<>(this.searchableItems);
     }
 
+    /**
+     * Sets UI elements
+     */
     @Override
     public void onBackPressed() {
-        Fragment f = getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-
-        if (f instanceof ShoppingItemSearchFragment) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.nav_host_fragment, ShoppingFragment.class, null).addToBackStack("").commit();
-        } else {
-            super.onBackPressed();
-        }
-
         if(bluetooth.isConnected()) {
             shoppingViewModel.getBluetoothButton().setText("Connected");
         } else {
@@ -262,6 +274,9 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Hides the search menu option until a fragment wants it visible
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -273,6 +288,9 @@ public class HomeActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Shows an error alert
+     */
     private void showErrorDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("Error")
@@ -282,6 +300,9 @@ public class HomeActivity extends AppCompatActivity {
                 .show();
     }
 
+    /**
+     * Initializes bluetooth
+     */
     private void initBluetooth()
     {
         bluetooth = new Bluetooth(this);
@@ -307,6 +328,9 @@ public class HomeActivity extends AppCompatActivity {
         bluetooth.onStop();
     }
 
+    /**
+     * Handles callbacks for bluetooth on receiving messages
+     */
     private DeviceCallback deviceCallback = new DeviceCallback() {
         @SuppressLint("DefaultLocale")
         @Override

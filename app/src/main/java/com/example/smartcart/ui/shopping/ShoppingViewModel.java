@@ -8,10 +8,8 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.smartcart.ui.search.SearchItem;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -23,7 +21,7 @@ public class ShoppingViewModel extends ViewModel {
     // used for communicating between fragments/dialogs
     private MutableLiveData<ArrayList<ShoppingListItem>> shoppingList;
     private Set<String> itemNames;
-    public  MutableLiveData<BigDecimal> subtotal; //TODO: add gst
+    public  MutableLiveData<BigDecimal> subtotal;
     private MutableLiveData<SearchItem> nextItem;
     private MutableLiveData<ArrayList<ShoppingList>> history;
     private MutableLiveData<Boolean> sessionActive;

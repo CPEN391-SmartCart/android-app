@@ -7,7 +7,6 @@ import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.util.SparseArray;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.TextView;
@@ -25,6 +24,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.IOException;
 
+/**
+ * This activity represents the barcode scanner and camera
+ */
 public class CameraActivity extends AppCompatActivity {
 
     private static final int REQUEST_CAMERA_PERMISSION = 201;
@@ -66,6 +68,9 @@ public class CameraActivity extends AppCompatActivity {
         initialiseDetectorsAndSources();
     }
 
+    /**
+     * Initializes the barcode scanner
+     */
     private void initialiseDetectorsAndSources()
     {
         captureButton.setOnClickListener((view) -> {

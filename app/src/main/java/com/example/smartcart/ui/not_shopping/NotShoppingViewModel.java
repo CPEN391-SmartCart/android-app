@@ -1,26 +1,25 @@
 package com.example.smartcart.ui.not_shopping;
 
-import android.widget.Button;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.smartcart.ui.search.SearchItem;
-import com.example.smartcart.ui.shopping.ShoppingList;
 import com.example.smartcart.ui.shopping.ShoppingListItem;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import me.aflak.bluetooth.Bluetooth;
 
+/**
+ * Represents a shared collection of resources related to planning between fragments
+ *
+ */
 public class NotShoppingViewModel extends ViewModel {
 
-    // used for communicating between fragments/dialogs
     private MutableLiveData<ArrayList<ShoppingListItem>> shoppingList;
     private Set<String> itemNames;
     public  MutableLiveData<BigDecimal> total;
@@ -37,7 +36,6 @@ public class NotShoppingViewModel extends ViewModel {
         total.setValue(new BigDecimal("0.00"));
 
         nextItem = new MutableLiveData<>();
-        initShoppingList();
     }
 
     public void setBluetooth(Bluetooth bluetooth) { this.bluetooth = bluetooth; }
@@ -68,6 +66,10 @@ public class NotShoppingViewModel extends ViewModel {
         return null;
     }
 
+    /**
+     * Adds an shopping list item to the internal array
+     * @param item - the item to add
+     */
     public void addShoppingListItem(ShoppingListItem item) {
         ArrayList<ShoppingListItem> temp_list = new ArrayList<>(shoppingList.getValue());
         if (itemNames.contains(item.getItemName())) {
@@ -84,6 +86,10 @@ public class NotShoppingViewModel extends ViewModel {
         shoppingList.setValue(temp_list);
     }
 
+    /**
+     * Removes a shopping list item to the internal array
+     * @param itemName - the name of the item to remove
+     */
     public void removeShoppingListItem(String itemName) {
         ArrayList<ShoppingListItem> temp_list = new ArrayList<>(shoppingList.getValue());
         System.out.println(itemName);
@@ -97,33 +103,5 @@ public class NotShoppingViewModel extends ViewModel {
         }
         total.setValue(total.getValue().subtract(item.getPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
         shoppingList.setValue(temp_list);
-    }
-
-    public void clearShoppingList() {
-        shoppingList.setValue(new ArrayList<>());
-        itemNames = new HashSet<>();
-        total.setValue(new BigDecimal("0.00"));
-    }
-
-    private void initShoppingList() {
-
-//        addShoppingListItem(new ShoppingListItem(1, "Pickles", 9.90));
-//        addShoppingListItem(new ShoppingListItem(1, "Mayo", 3.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Bread", 1.99));
-//        addShoppingListItem(new ShoppingListItem(2, "Cheese", 1.99));
-//        addShoppingListItem(new ShoppingListItem(3, "Mountain Dew", 3.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Chug Jug", 9.90));
-//        addShoppingListItem(new ShoppingListItem(1, "Mayo", 3.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Bread", 1.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Cheese", 1.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Mountain Dew", 3.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Pickles", 9.90));
-//        addShoppingListItem(new ShoppingListItem(1, "Mayo", 3.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Bread", 1.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Cheese", 1.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Mountain Dew", 3.99));
-//        addShoppingListItem(new ShoppingListItem(1, "Doritos", 3.99));
     }
 }

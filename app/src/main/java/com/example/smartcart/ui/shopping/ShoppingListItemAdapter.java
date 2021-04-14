@@ -1,6 +1,5 @@
 package com.example.smartcart.ui.shopping;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,10 +12,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.smartcart.R;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 
+/**
+ * Allows us to display the contents of a shopping list
+ */
 public class ShoppingListItemAdapter extends RecyclerView.Adapter<ShoppingListItemAdapter.ShoppingListItemViewHolder>{
     private LayoutInflater inflater;
     private Context context;
@@ -65,6 +65,9 @@ public class ShoppingListItemAdapter extends RecyclerView.Adapter<ShoppingListIt
         private TextView price;
         private ImageButton remove;
 
+        /**
+         * Represents the layout associated with an entry in the recyclerView
+         */
         public ShoppingListItemViewHolder(View itemView) {
             super(itemView);
             quantity = (TextView) itemView.findViewById(R.id.quantity);

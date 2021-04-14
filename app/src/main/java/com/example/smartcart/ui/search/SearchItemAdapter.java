@@ -11,12 +11,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.smartcart.R;
 
-import org.w3c.dom.Text;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Locale;
 
+/**
+ * Allows us to display a filtered searchable item list
+ */
 public class SearchItemAdapter extends RecyclerView.Adapter<SearchItemAdapter.SearchItemViewHolder> {
     private LayoutInflater inflater;
     ArrayList<SearchItem> item_list;
@@ -30,17 +31,15 @@ public class SearchItemAdapter extends RecyclerView.Adapter<SearchItemAdapter.Se
         this.add_item = add_item;
     }
 
-    public void refreshList(ArrayList<SearchItem> item_list) {
-        this.filtered_item_list = item_list;
-        this.item_list = item_list;
-    }
-
     @Override
     public SearchItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.search_item, parent, false);
         return new SearchItemViewHolder(view);
     }
 
+    /**
+     * This is continuously called on characterText change to filter the item list
+     */
     public void filter(String characterText) {
         characterText = characterText.toLowerCase(Locale.getDefault());
         filtered_item_list.clear();
@@ -76,6 +75,9 @@ public class SearchItemAdapter extends RecyclerView.Adapter<SearchItemAdapter.Se
         return filtered_item_list.size();
     }
 
+    /**
+     * Represents the layout associated with an entry in the recyclerView
+     */
     public class SearchItemViewHolder extends RecyclerView.ViewHolder {
 
         private TextView itemName;

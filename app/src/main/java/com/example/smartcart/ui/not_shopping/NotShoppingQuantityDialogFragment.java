@@ -13,14 +13,16 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.example.smartcart.R;
-import com.example.smartcart.ui.shopping.ShoppingFragment;
 import com.example.smartcart.ui.shopping.ShoppingListItem;
 import com.example.smartcart.ui.shopping.ShoppingViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * This fragment represents selecting the quantity of the item to add
+ * The item is specified by the viewModel
+ */
 public class NotShoppingQuantityDialogFragment extends DialogFragment {
-
 
     private NotShoppingViewModel notShoppingViewModel;
     private ShoppingViewModel shoppingViewModel;
@@ -32,6 +34,7 @@ public class NotShoppingQuantityDialogFragment extends DialogFragment {
         notShoppingViewModel = new ViewModelProvider(requireActivity()).get(NotShoppingViewModel.class);
         shoppingViewModel = new ViewModelProvider(requireActivity()).get(ShoppingViewModel.class);
 
+        // Setup for quantity selecting number picker
         RelativeLayout linearLayout = new RelativeLayout(requireActivity());
         aNumberPicker = new NumberPicker(requireActivity());
         aNumberPicker.setMaxValue(99);
@@ -45,6 +48,7 @@ public class NotShoppingQuantityDialogFragment extends DialogFragment {
         linearLayout.setLayoutParams(params);
         linearLayout.addView(aNumberPicker,numPicerParams);
 
+        // Setup for the bottom buttons
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
         alertDialogBuilder.setTitle("Select quantity");
         alertDialogBuilder.setView(linearLayout);

@@ -2,6 +2,9 @@ package com.example.smartcart.ui.search;
 
 import java.math.BigDecimal;
 
+/**
+ * Represents a searchable item from the database
+ */
 public class SearchItem {
     private String itemName;
     private BigDecimal price;

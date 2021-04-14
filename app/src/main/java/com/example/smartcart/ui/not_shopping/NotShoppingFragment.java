@@ -35,7 +35,6 @@ import com.example.smartcart.R;
 import com.example.smartcart.ui.shopping.ShoppingListItem;
 import com.example.smartcart.ui.shopping.ShoppingListItemAdapter;
 import com.example.smartcart.ui.stats.StatsItem;
-import com.example.smartcart.ui.stats.StatsItemAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,8 +42,10 @@ import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Comparator;
 
+/**
+ * Represents the not shopping view containing the Path planning and cart generation functionalities
+ */
 public class NotShoppingFragment extends Fragment {
 
     private NotShoppingViewModel notShoppingViewModel;
@@ -58,14 +59,14 @@ public class NotShoppingFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_not_shopping, container, false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
 
-        // recycler
+        // Setup recyclerView to display items in planned shopping list
         RecyclerView recycler = root.findViewById(R.id.not_shopping_list);
         recycler.addItemDecoration(new DividerItemDecoration(getActivity().getApplicationContext(),
                 DividerItemDecoration.VERTICAL));
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recycler.setLayoutManager(layoutManager);
 
-        //
+        // Callback for removing item
         View.OnClickListener remove_item = v -> {
             LinearLayout layout = (LinearLayout) v.getParent();
             TextView itemName = layout.findViewById(R.id.itemName);
@@ -76,10 +77,10 @@ public class NotShoppingFragment extends Fragment {
         adapter = new ShoppingListItemAdapter(getActivity().getApplicationContext(), notShoppingViewModel.getShoppingList().getValue(), remove_item);
         recycler.setAdapter(adapter);
 
-        // for adding App Bar button
+        // Displays the Search icon
         setHasOptionsMenu(true);
 
-        //Knapsack
+        //Knapsack cart generation
         Button knapsack = root.findViewById(R.id.knapsack);
         EditText budgetInput = root.findViewById(R.id.budgetInput);
         knapsack.setOnClickListener(v -> {
@@ -94,6 +95,9 @@ public class NotShoppingFragment extends Fragment {
         return root;
     }
 
+    /**
+     * Retrieves stats in order to generate a cart
+     */
     public void getStats() {
         RequestQueue queue = Volley.newRequestQueue(requireActivity());
         String url ="https://cpen391-smartcart.herokuapp.com/stats/frequency?"+"googleId=" + ((HomeActivity) getActivity()).getGoogleId() + "&N=5" ;
@@ -125,6 +129,11 @@ public class NotShoppingFragment extends Fragment {
         queue.add(stringRequest);
     }
 
+    /**
+     * Attempts to generate a cart using previous shopping habits
+     *
+     * @param budgetAmount - the given budget
+     */
     public void executeKnapsackAlgorithm(Double budgetAmount){
         BigDecimal budgetRemaining = new BigDecimal(budgetAmount).setScale(2, BigDecimal.ROUND_HALF_UP);
         ArrayList<StatsItem> itemsToAdd = new ArrayList<>(topItems);
@@ -157,7 +166,7 @@ public class NotShoppingFragment extends Fragment {
     }
 
     /**
-     * Adds a button to the menu bar
+     * Adds an add item button to the menu bar
      */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -166,14 +175,13 @@ public class NotShoppingFragment extends Fragment {
     }
 
     /**
-     * This functions as a onclick listener for the button
+     * This functions as a onclick listener for the add item button
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         if (id == R.id.add_item_button) {
-            System.out.println("nav to search");
             Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_not_shopping_to_navigation_not_shopping_search);
         }
         return super.onOptionsItemSelected(item);

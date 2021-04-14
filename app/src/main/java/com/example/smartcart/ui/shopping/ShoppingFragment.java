@@ -1,12 +1,8 @@
 package com.example.smartcart.ui.shopping;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -16,11 +12,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.SharedElementCallback;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,12 +23,12 @@ import com.example.smartcart.R;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.function.BiFunction;
 
 import cdflynn.android.library.checkview.CheckView;
 
+/**
+ * Represents the shopping list functionality of the app
+ */
 public class ShoppingFragment extends Fragment {
 
     private ShoppingViewModel shoppingViewModel;
@@ -47,13 +41,14 @@ public class ShoppingFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_shopping, container, false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
 
-        // recycler
+        // Setups the recyclerView showing the shopping list
         RecyclerView recycler = root.findViewById(R.id.recycler);
         recycler.addItemDecoration(new DividerItemDecoration(getActivity().getApplicationContext(),
                 DividerItemDecoration.VERTICAL));
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recycler.setLayoutManager(layoutManager);
-        // create onClickListener here so that we can use shoppingViewModel
+
+        // We create an onClickListener here so that we can use shoppingViewModel
         View.OnClickListener remove_item = v -> {
             LinearLayout layout = (LinearLayout) v.getParent();
             TextView itemName = layout.findViewById(R.id.itemName);
@@ -64,10 +59,7 @@ public class ShoppingFragment extends Fragment {
         adapter = new ShoppingListItemAdapter(getActivity().getApplicationContext(), shoppingViewModel.getShoppingList().getValue(), remove_item);
         recycler.setAdapter(adapter);
 
-        // for adding App Bar button
-        setHasOptionsMenu(true);
-
-        // cart_total
+        // UI for displaying the subtotal, gst, total cost of the cart
         TextView cart_subtotal = root.findViewById(R.id.cart_subtotal);
         TextView cart_gst = root.findViewById(R.id.cart_gst);
         TextView cart_total = root.findViewById(R.id.cart_total);
@@ -82,7 +74,7 @@ public class ShoppingFragment extends Fragment {
             }
         });
 
-        // checkout
+        // Setups checkout button
         Button checkout = (Button) root.findViewById(R.id.checkout);
         checkout.setOnClickListener(v -> {
             if (shoppingViewModel.subtotal.getValue().compareTo(new BigDecimal(0)) == 0) {
@@ -97,7 +89,7 @@ public class ShoppingFragment extends Fragment {
             }
         });
 
-        // update recycler view on value change
+        // Update recyclerView on value change
         shoppingViewModel.getShoppingList().observe(getActivity(), new Observer<ArrayList<ShoppingListItem>>() {
             @Override
             public void onChanged(ArrayList<ShoppingListItem> shoppingListItems) {
@@ -106,6 +98,7 @@ public class ShoppingFragment extends Fragment {
             }
         });
 
+        // Displays a checkmark animation on successful checkout
         shoppingViewModel.getHistory().observe(getActivity(), new Observer<ArrayList<ShoppingList>>() {
             @Override
             public void onChanged(ArrayList<ShoppingList> shoppingLists) {
@@ -125,27 +118,5 @@ public class ShoppingFragment extends Fragment {
 
         adapter.notifyDataSetChanged();
         return root;
-    }
-
-    /**
-     * Adds a button to the menu bar
-     */
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.add_item_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    /**
-     * This functions as a onclick listener for the button
-     */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.add_item_button) {
-            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_shopping_to_navigation_shopping_search);
-        }
-        return super.onOptionsItemSelected(item);
     }
 }

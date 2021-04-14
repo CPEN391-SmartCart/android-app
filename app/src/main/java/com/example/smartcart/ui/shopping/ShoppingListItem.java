@@ -1,13 +1,11 @@
 package com.example.smartcart.ui.shopping;
 
-import java.math.BigDecimal;
-import java.util.UUID;
-
 import com.example.smartcart.ui.search.SearchItem;
 
+import java.math.BigDecimal;
+
 /**
- * Represents an item in the shoppingList
- *
+ * Represents an item in a shopping list
  */
 public class ShoppingListItem {
     private Integer quantity;

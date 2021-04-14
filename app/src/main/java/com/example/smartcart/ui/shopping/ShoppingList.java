@@ -1,9 +1,12 @@
 package com.example.smartcart.ui.shopping;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
+/**
+ * Represents a shopping list
+ */
 public class ShoppingList {
     private ArrayList<ShoppingListItem> items;
     private BigDecimal subtotal;

@@ -1,9 +1,7 @@
 package com.example.smartcart.ui.stats;
 
-import android.app.AlertDialog;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +15,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -27,34 +24,27 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.smartcart.HomeActivity;
 import com.example.smartcart.R;
-import com.example.smartcart.ui.search.SearchItem;
-import com.example.smartcart.ui.search.SearchItemAdapter;
 import com.example.smartcart.ui.shopping.ShoppingList;
 import com.example.smartcart.ui.shopping.ShoppingListAdapter;
-import com.example.smartcart.ui.shopping.ShoppingListItem;
-import com.example.smartcart.ui.shopping.ShoppingListItemAdapter;
 import com.example.smartcart.ui.shopping.ShoppingViewModel;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
+/**
+ * This fragment displays the information related to the users statistics and shopping habits
+ */
 public class StatsFragment extends Fragment {
 
-    StatsItemAdapter topItemsAdapter;
-    ShoppingListAdapter historyAdapter;
-    ArrayList<StatsItem> topItems = new ArrayList<>();
-
+    private ShoppingListAdapter historyAdapter;
+    private ArrayList<StatsItem> topItems = new ArrayList<>();
     private BarChart barChart;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -63,23 +53,14 @@ public class StatsFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_stats, container, false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
 
-        //setup top 10 items in bargraph
+        // Setup top 10 items in bargraph
         barChart = (BarChart) root.findViewById(R.id.bargraph);
         barChart.setTouchEnabled(false);
         barChart.setDragEnabled(false);
         barChart.setScaleEnabled(false);
         barChart.setDescription("");
 
-//        //setup top 10 items recyclerview
-//        RecyclerView topItemsRecycler = root.findViewById(R.id.topItems);
-//        topItemsRecycler.addItemDecoration(new DividerItemDecoration(getActivity().getApplicationContext(),
-//                DividerItemDecoration.VERTICAL));
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-//        topItemsRecycler.setLayoutManager(layoutManager);
-        topItemsAdapter = new StatsItemAdapter(getActivity().getApplicationContext(), topItems);
-//        topItemsRecycler.setAdapter(topItemsAdapter);
-
-        // set up recycler for shopping list histories
+        // Setup recycler for shopping list histories
         RecyclerView historyRecycler = root.findViewById(R.id.history);
         historyRecycler.addItemDecoration(new DividerItemDecoration(getActivity().getApplicationContext(), DividerItemDecoration.VERTICAL));
         LinearLayoutManager historyLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -87,6 +68,7 @@ public class StatsFragment extends Fragment {
         historyAdapter = new ShoppingListAdapter(getActivity(), shoppingViewModel.getHistory().getValue());
         historyRecycler.setAdapter(historyAdapter);
 
+        // Updates the UI on history changing
         shoppingViewModel.getHistory().observe(getActivity(), new Observer<ArrayList<ShoppingList>>() {
             @Override
             public void onChanged(ArrayList<ShoppingList> shoppingLists) {
@@ -100,6 +82,9 @@ public class StatsFragment extends Fragment {
         return root;
     }
 
+    /**
+     * Fetches stats information from the backend database
+     */
     public void getStats() {
         RequestQueue queue = Volley.newRequestQueue(requireActivity());
         String url ="https://cpen391-smartcart.herokuapp.com/stats/frequency?"+"googleId=" + ((HomeActivity) getActivity()).getGoogleId() + "&N=5" ;
@@ -113,8 +98,6 @@ public class StatsFragment extends Fragment {
                                 JSONObject item = items.getJSONObject(i);
                                 topItems.add(new StatsItem(item.getString("name"), item.getInt("sum"), item.getDouble("cost")));
                             }
-                            topItemsAdapter.refreshList(topItems);
-                            topItemsAdapter.notifyDataSetChanged();
 
                             // bar graph
                             ArrayList<BarEntry> barEntries = new ArrayList<>();

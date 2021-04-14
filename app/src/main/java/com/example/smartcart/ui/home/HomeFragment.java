@@ -8,39 +8,30 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.smartcart.HomeActivity;
 import com.example.smartcart.R;
 import com.example.smartcart.ui.not_shopping.NotShoppingViewModel;
-import com.example.smartcart.ui.shopping.ShoppingList;
-import com.example.smartcart.ui.shopping.ShoppingListAdapter;
 import com.example.smartcart.ui.shopping.ShoppingListItem;
-import com.example.smartcart.ui.shopping.ShoppingListItemAdapter;
 import com.example.smartcart.ui.shopping.ShoppingViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import me.aflak.bluetooth.Bluetooth;
 
+/**
+ * This fragment represents the home screen of the home activity
+ */
 public class HomeFragment extends Fragment {
 
     private ShoppingViewModel shoppingViewModel;
     private NotShoppingViewModel notShoppingViewModel;
-    private ShoppingListAdapter adapter;
     private Bluetooth bluetooth;
     private Button startSession;
     private Button bluetoothButton;
@@ -49,7 +40,6 @@ public class HomeFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         shoppingViewModel =
                 new ViewModelProvider(requireActivity()).get(ShoppingViewModel.class);
-
         notShoppingViewModel =
                 new ViewModelProvider(requireActivity()).get(NotShoppingViewModel.class);
 
@@ -57,7 +47,7 @@ public class HomeFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
 
-        // set up button for starting session
+        // Setup buttons for starting session
         startSession = root.findViewById(R.id.start_session_button);
         bluetoothButton = root.findViewById(R.id.smartcart_connect);
         shoppingViewModel.setBluetoothButton(bluetoothButton);
@@ -65,7 +55,7 @@ public class HomeFragment extends Fragment {
         startSession.setOnClickListener(v -> {
             if(bluetooth.isConnected()) {
                 shoppingViewModel.startSession();
-                if (shoppingViewModel.getBluetooth().getBluetoothAdapter() != null) { //TODO: check for bluetooth connection
+                if (shoppingViewModel.getBluetooth().getBluetoothAdapter() != null) {
                     String message = "rs: Resetting VGA display";
                     shoppingViewModel.getBluetooth().send(String.format("%02d", message.length()) + message); // reset display
 
@@ -104,6 +94,9 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
+    /**
+     * Handles pairing with the De1
+     */
     private void setupBluetooth(){
         List<BluetoothDevice> bluetoothDevices = bluetooth.getPairedDevices();
         AlertDialog.Builder bluetoothDialog = new AlertDialog.Builder(getActivity());

@@ -7,7 +7,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -19,28 +18,21 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.example.smartcart.HomeActivity;
 import com.example.smartcart.R;
-import com.example.smartcart.ui.shopping.ShoppingListItem;
-import com.example.smartcart.ui.shopping.ShoppingQuantityDialogFragment;
 import com.example.smartcart.ui.search.SearchItem;
 import com.example.smartcart.ui.search.SearchItemAdapter;
+import com.example.smartcart.ui.shopping.ShoppingListItem;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Locale;
 
+/**
+ * This fragment represents search items to be added the notShoppingFragment planning list
+ */
 public class NotShoppingItemSearchFragment extends Fragment {
 
     private NotShoppingViewModel notShoppingViewModel;
@@ -54,12 +46,15 @@ public class NotShoppingItemSearchFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_search, container, false);
         setHasOptionsMenu(true);
 
-        // recycler
+        // Setups recyclerView for displaying the searchable items
         RecyclerView recycler = (RecyclerView) root.findViewById(R.id.recycler);
         recycler.addItemDecoration(new DividerItemDecoration(getActivity().getApplicationContext(),
                 DividerItemDecoration.VERTICAL));
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recycler.setLayoutManager(layoutManager);
+
+        // Adds a listener for adding items to the planning shopping list
+        // For Quantity determined price items we instead open a quantity selection dialog
         View.OnClickListener add_item = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,6 +84,7 @@ public class NotShoppingItemSearchFragment extends Fragment {
         MenuItem searchBar = menu.findItem(R.id.action_search);
         searchBar.setVisible(true);
         SearchView search = (SearchView) searchBar.getActionView();
+        // Setup listener for filtering text
         search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -103,6 +99,9 @@ public class NotShoppingItemSearchFragment extends Fragment {
         });
     }
 
+    /**
+     * Acts as a onClickListener for the back button (It is called home by android)
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();

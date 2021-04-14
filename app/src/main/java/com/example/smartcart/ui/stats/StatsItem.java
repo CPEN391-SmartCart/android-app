@@ -2,6 +2,9 @@ package com.example.smartcart.ui.stats;
 
 import java.math.BigDecimal;
 
+/**
+ * Represents a stats item to display in the statsFragment
+ */
 public class StatsItem {
     private String name;
     private Integer count;

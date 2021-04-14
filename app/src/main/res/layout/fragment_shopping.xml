@@ -25,14 +25,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:weightSum="10"
         tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="4dp"
-        android:weightSum="10">
+        tools:layout_editor_absoluteY="4dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -40,9 +39,9 @@
                 android:id="@+id/textView4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:layout_marginStart="4dp"
                 android:layout_weight="1"
+                android:gravity="center"
                 android:text="@string/qty" />
 
             <TextView
@@ -59,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:layout_weight="2"
-                android:text="@string/weight" />
+                android:text="" />
 
             <TextView
                 android:id="@+id/textView2"
@@ -83,14 +82,14 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="16dp"
-            android:layout_weight="8"/>
+            android:layout_weight="8" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:orientation="horizontal"
             android:layout_marginBottom="20dp"
             android:layout_weight="1"
+            android:orientation="horizontal"
             android:weightSum="3">
 
             <TableLayout
@@ -100,7 +99,7 @@
 
                 <TableRow
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" >
+                    android:layout_height="match_parent">
 
                     <TextView
                         android:id="@+id/cart_subtotal"
@@ -123,7 +122,7 @@
 
                 <TableRow
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" >
+                    android:layout_height="match_parent">
 
                     <TextView
                         android:id="@+id/cart_gst"

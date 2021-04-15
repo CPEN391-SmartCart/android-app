@@ -63,6 +63,7 @@ public class NotShoppingItemSearchFragment extends Fragment {
                 TextView barcode = v.findViewById(R.id.barcode);
                 notShoppingViewModel.setNextItem(new SearchItem(itemName.getText().toString(), new BigDecimal(price.getText().toString().replace("/kg", "").substring(1)), barcode.getText().toString(), false));
                 if (price.getText().toString().endsWith("/kg")) {
+                    // requires weighing
                     notShoppingViewModel.addShoppingListItem(new ShoppingListItem(1, notShoppingViewModel.getNextItem()));
                     Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_not_shopping_search_to_navigation_not_shopping);
                 } else {

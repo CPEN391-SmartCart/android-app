@@ -61,6 +61,7 @@ public class NotShoppingQuantityDialogFragment extends DialogFragment {
                                 if (notShoppingViewModel.getNextPathedItem() == null && shoppingViewModel.isSessionActive().getValue())
                                 {
                                     int pathedBarcodeLength = 3 + notShoppingViewModel.getNextItem().getBarcode().length();
+                                    // Tell the path planner the starting barcode
                                     notShoppingViewModel.getBluetooth().send(String.format("%02d", pathedBarcodeLength) + "ps:" + notShoppingViewModel.getNextItem().getBarcode());
                                 }
                                 notShoppingViewModel.addShoppingListItem(new ShoppingListItem(aNumberPicker.getValue(), notShoppingViewModel.getNextItem()));

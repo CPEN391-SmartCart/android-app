@@ -84,10 +84,10 @@ public class NotShoppingFragment extends Fragment {
         Button knapsack = root.findViewById(R.id.knapsack);
         EditText budgetInput = root.findViewById(R.id.budgetInput);
         knapsack.setOnClickListener(v -> {
-            try{
-                Double budgetAmount  = Double.parseDouble(budgetInput.getText().toString());
+            try {
+                Double budgetAmount = Double.parseDouble(budgetInput.getText().toString());
                 executeKnapsackAlgorithm(budgetAmount);
-            }catch(NumberFormatException e){
+            } catch (NumberFormatException e) {
                 Toast.makeText(getContext(), "Invalid budget input", Toast.LENGTH_SHORT).show();
             }
         });
@@ -100,7 +100,7 @@ public class NotShoppingFragment extends Fragment {
      */
     public void getStats() {
         RequestQueue queue = Volley.newRequestQueue(requireActivity());
-        String url ="https://cpen391-smartcart.herokuapp.com/stats/frequency?"+"googleId=" + ((HomeActivity) getActivity()).getGoogleId() + "&N=5" ;
+        String url = "https://cpen391-smartcart.herokuapp.com/stats/frequency?" + "googleId=" + ((HomeActivity) getActivity()).getGoogleId() + "&N=5";
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -134,24 +134,17 @@ public class NotShoppingFragment extends Fragment {
      *
      * @param budgetAmount - the given budget
      */
-    public void executeKnapsackAlgorithm(Double budgetAmount){
-        BigDecimal budgetRemaining = new BigDecimal(budgetAmount).setScale(2, BigDecimal.ROUND_HALF_UP);
-        ArrayList<StatsItem> itemsToAdd = new ArrayList<>(topItems);
-        BigDecimal shoppingListCost = new BigDecimal(0.0);
-        for (ShoppingListItem item: notShoppingViewModel.getShoppingList().getValue()){
-            itemsToAdd.removeIf(n -> (n.getName().equals(item.getItemName())));
-            shoppingListCost = shoppingListCost.add(item.getTotalPrice());
-        }
-        budgetRemaining = budgetRemaining.subtract(shoppingListCost);
-
-        if(budgetRemaining.compareTo(new BigDecimal(0.0)) < 0){
+    public void executeKnapsackAlgorithm(Double budgetAmount) {
+        BudgetAndItemsToAdd budgetAndItemsToAdd = calculateBudgetRemaining(new BigDecimal(budgetAmount).setScale(2, BigDecimal.ROUND_HALF_UP), topItems, notShoppingViewModel.getShoppingList().getValue());
+        BigDecimal budgetRemaining = budgetAndItemsToAdd.budgetRemaining;
+        ArrayList<StatsItem> itemsToAdd = budgetAndItemsToAdd.itemsToAdd;
+        if (budgetRemaining.compareTo(new BigDecimal(0.0)) < 0) {
             AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity())
                     .setTitle("Error")
                     .setMessage("Shopping list cost already exceeds budget! Please remove some items!");
             builder.setPositiveButton("Understood", null);
             builder.create().show();
-        }
-        else {
+        } else {
             itemsToAdd.sort((StatsItem i1, StatsItem i2) -> i2.getCount() - i1.getCount());
             for (StatsItem item : itemsToAdd) {
                 BigDecimal cost = item.getCost();
@@ -163,6 +156,34 @@ public class NotShoppingFragment extends Fragment {
             adapter.refreshList(notShoppingViewModel.getShoppingList().getValue());
             adapter.notifyDataSetChanged();
         }
+    }
+
+    public static class BudgetAndItemsToAdd {
+        public ArrayList<StatsItem> itemsToAdd;
+        public BigDecimal budgetRemaining;
+    }
+
+    /**
+     * Calculates the remaining budget and items to add to the shopping list
+     * @param budgetAmount The starting budget amount
+     * @param topItems the top items that could be added to the shopping list
+     * @param shoppingList the current shopping list
+     * @return the remaining budget and items to add to the shopping list
+     */
+    public static BudgetAndItemsToAdd calculateBudgetRemaining(BigDecimal budgetAmount, ArrayList<StatsItem> topItems, ArrayList<ShoppingListItem> shoppingList) {
+        BigDecimal budgetRemaining = budgetAmount;
+        ArrayList<StatsItem> itemsToAdd = new ArrayList<>(topItems);
+        BigDecimal shoppingListCost = new BigDecimal(0.0);
+        for (ShoppingListItem item : shoppingList) {
+            itemsToAdd.removeIf(n -> (n.getName().equals(item.getItemName())));
+            shoppingListCost = shoppingListCost.add(item.getTotalPrice());
+        }
+
+        budgetRemaining = budgetRemaining.subtract(shoppingListCost);
+        BudgetAndItemsToAdd retval = new BudgetAndItemsToAdd();
+        retval.itemsToAdd = itemsToAdd;
+        retval.budgetRemaining = budgetRemaining;
+        return retval;
     }
 
     /**

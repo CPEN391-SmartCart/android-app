@@ -41,9 +41,18 @@ public class NotShoppingViewModel extends ViewModel {
     public void setBluetooth(Bluetooth bluetooth) { this.bluetooth = bluetooth; }
     public Bluetooth getBluetooth() {return this.bluetooth; }
 
+    /**
+     * Sets the next search item to the shopping list
+     * @param nextItem the next item from the search
+     */
     public void setNextItem(SearchItem nextItem) {
         this.nextItem.setValue(nextItem);
     }
+
+    /**
+     * Gets the next item from the shopping view
+     * @return the next item
+     */
     public SearchItem getNextItem() {return nextItem.getValue(); }
 
     public LiveData<ArrayList<ShoppingListItem>> getShoppingList() { return shoppingList; }
@@ -53,6 +62,10 @@ public class NotShoppingViewModel extends ViewModel {
         this.scannedBarcodes.add(scannedBarcode);
     }
 
+    /**
+     * Gets the next item that has been pathed but now has been scanned
+     * @return next pathed item
+     */
     public ShoppingListItem getNextPathedItem()
     {
         for (ShoppingListItem shoppingListItem : shoppingList.getValue())

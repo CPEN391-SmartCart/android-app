@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.example.smartcart.ui.home.HomeFragment"
+        android:name="com.cpen391.smartcart.ui.home.HomeFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" >
         <action
@@ -28,7 +28,7 @@
     </fragment>
     <fragment
         android:id="@+id/navigation_shopping"
-        android:name="com.example.smartcart.ui.shopping.ShoppingFragment"
+        android:name="com.cpen391.smartcart.ui.shopping.ShoppingFragment"
         android:label="@string/title_shopping"
         tools:layout="@layout/fragment_shopping" >
         <action
@@ -37,7 +37,7 @@
     </fragment>
     <fragment
         android:id="@+id/navigation_not_shopping"
-        android:name="com.example.smartcart.ui.not_shopping.NotShoppingFragment"
+        android:name="com.cpen391.smartcart.ui.not_shopping.NotShoppingFragment"
         android:label="@string/title_not_shopping"
         tools:layout="@layout/fragment_not_shopping" >
         <action
@@ -46,7 +46,7 @@
     </fragment>
     <fragment
         android:id="@+id/navigation_camera"
-        android:name="com.example.smartcart.ui.camera.CameraFragment"
+        android:name="com.cpen391.smartcart.ui.camera.CameraFragment"
         android:label="@string/title_camera"
         tools:layout="@layout/activity_camera" >
         <action
@@ -58,7 +58,7 @@
     </fragment>
     <fragment
         android:id="@+id/navigation_shopping_search"
-        android:name="com.example.smartcart.ui.shopping.ShoppingItemSearchFragment"
+        android:name="com.cpen391.smartcart.ui.shopping.ShoppingItemSearchFragment"
         android:label="@string/title_search">
         <action
             android:id="@+id/action_navigation_shopping_search_to_navigation_shopping"
@@ -66,7 +66,7 @@
     </fragment>
     <fragment
         android:id="@+id/navigation_weight"
-        android:name="com.example.smartcart.ui.camera.WeightFragment"
+        android:name="com.cpen391.smartcart.ui.camera.WeightFragment"
         android:label="Weight"
         tools:layout="@layout/fragment_weight" >
         <action
@@ -79,7 +79,7 @@
     </fragment>
     <fragment
         android:id="@+id/navigation_not_shopping_search"
-        android:name="com.example.smartcart.ui.not_shopping.NotShoppingItemSearchFragment"
+        android:name="com.cpen391.smartcart.ui.not_shopping.NotShoppingItemSearchFragment"
         android:label="@string/title_search">
         <action
             android:id="@+id/action_navigation_not_shopping_search_to_navigation_not_shopping"
@@ -88,7 +88,7 @@
 
     <fragment
         android:id="@+id/navigation_stats"
-        android:name="com.example.smartcart.ui.stats.StatsFragment"
+        android:name="com.cpen391.smartcart.ui.stats.StatsFragment"
         android:label="@string/title_stats">
     </fragment>
 

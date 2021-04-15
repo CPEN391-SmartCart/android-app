@@ -25,6 +25,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.io.IOException;
 
 /**
+ * Adapted from: https://medium.com/analytics-vidhya/creating-a-barcode-scanner-using-android-studio-71cff11800a2
+ */
+
+/**
  * This activity represents the barcode scanner and camera
  */
 public class CameraActivity extends AppCompatActivity {

@@ -59,13 +59,6 @@ public class HomeFragment extends Fragment {
                     String message = "rs: Resetting VGA display";
                     shoppingViewModel.getBluetooth().send(String.format("%02d", message.length()) + message); // reset display
 
-
-                    ShoppingListItem nextShoppingItem = notShoppingViewModel.getNextPathedItem();
-                    if (nextShoppingItem != null) {
-                        int pathedBarcodeLength = 3 + nextShoppingItem.getBarcode().length();
-                        notShoppingViewModel.getBluetooth().send(String.format("%02d", pathedBarcodeLength) + "ps:" + nextShoppingItem.getBarcode());
-                    }
-
                     Toast.makeText(getActivity(), "Session started", Toast.LENGTH_SHORT).show();
                 }
             } else {

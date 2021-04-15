@@ -125,17 +125,6 @@ public class HomeActivity extends AppCompatActivity {
                     navController.navigate(R.id.navigation_shopping);
 
                     notShoppingViewModel.addScannedBarcode(barcode);
-                    ShoppingListItem shoppingListItem = notShoppingViewModel.getNextPathedItem();
-                    if (shoppingListItem != null)
-                    {
-                        int pathedBarcodeLength = 3 + shoppingListItem.getBarcode().length();
-                        bluetooth.send(String.format("%02d", pathedBarcodeLength) + "pp:" + shoppingListItem.getBarcode());
-                    }
-                    else
-                    {
-                        int pathedBarcodeLength = 3 + 4;
-                        bluetooth.send(String.format("%02d", pathedBarcodeLength) + "pc:ggez");
-                    }
                 }
             }
         }
@@ -348,15 +337,40 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         public void onMessage(byte[] message) {
             String receivedMsg = new String(message);
-            Log.d("NICE", receivedMsg);
-            String[] item = receivedMsg.split("\\|");
-            String name = item[0];
-            double price = Double.parseDouble(item[1]);
-            shoppingViewModel.addShoppingListItem(new ShoppingListItem(1, name, price, 0.0));
 
-            String ack = "ic:" + price;
-            int length = ack.length();
-            bluetooth.send(String.format("%02d", length) + ack);
+            if (receivedMsg.equals("resetdone"))
+            {
+                ShoppingListItem nextShoppingItem = notShoppingViewModel.getNextPathedItem();
+                if (nextShoppingItem != null) {
+                    int pathedBarcodeLength = 3 + nextShoppingItem.getBarcode().length();
+                    notShoppingViewModel.getBluetooth().send(String.format("%02d", pathedBarcodeLength) + "ps:" + nextShoppingItem.getBarcode());
+                }
+            }
+            else if (receivedMsg.equals("acked"))
+            {
+                ShoppingListItem shoppingListItem = notShoppingViewModel.getNextPathedItem();
+                if (shoppingListItem != null)
+                {
+                    int pathedBarcodeLength = 3 + shoppingListItem.getBarcode().length();
+                    bluetooth.send(String.format("%02d", pathedBarcodeLength) + "pp:" + shoppingListItem.getBarcode());
+                }
+                else
+                {
+                    int pathedBarcodeLength = 3 + 4;
+                    bluetooth.send(String.format("%02d", pathedBarcodeLength) + "pc:ggez");
+                }
+            }
+            else
+            {
+                String[] item = receivedMsg.split("\\|");
+                String name = item[0];
+                double price = Double.parseDouble(item[1]);
+                shoppingViewModel.addShoppingListItem(new ShoppingListItem(1, name, price, 0.0));
+
+                String ack = "ic:" + price;
+                int length = ack.length();
+                bluetooth.send(String.format("%02d", length) + ack);
+            }
         }
 
         @Override

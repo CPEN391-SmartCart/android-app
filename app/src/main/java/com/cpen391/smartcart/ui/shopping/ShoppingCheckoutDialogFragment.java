@@ -233,7 +233,7 @@ public class ShoppingCheckoutDialogFragment extends DialogFragment {
         try {
             body.put("receiptId", receiptId);
             body.put("quantity", item.getQuantity());
-            body.put("name", item.getItemName());
+            body.put("name", item.getItemName().trim());
             body.put("cost", item.getPrice());
             body.put("weight", item.getWeight());
         } catch (JSONException e) {

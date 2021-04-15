@@ -24,6 +24,12 @@ public class SearchItemAdapter extends RecyclerView.Adapter<SearchItemAdapter.Se
     ArrayList<SearchItem> filtered_item_list = new ArrayList<>();
     View.OnClickListener add_item;
 
+    /**
+     * Sets up the search item adapter
+     * @param context the context
+     * @param item_list the list of items to add
+     * @param add_item the listener for adding items
+     */
     public SearchItemAdapter(Context context, ArrayList<SearchItem> item_list, View.OnClickListener add_item) {
         inflater = LayoutInflater.from(context);
         this.item_list = item_list;
@@ -39,6 +45,7 @@ public class SearchItemAdapter extends RecyclerView.Adapter<SearchItemAdapter.Se
 
     /**
      * This is continuously called on characterText change to filter the item list
+     * @param characterText The character text to filter with
      */
     public void filter(String characterText) {
         characterText = characterText.toLowerCase(Locale.getDefault());
@@ -85,6 +92,10 @@ public class SearchItemAdapter extends RecyclerView.Adapter<SearchItemAdapter.Se
         private TextView barcode;
         private LinearLayout layout;
 
+        /**
+         * Makes a new search item view holder
+         * @param itemView the item view
+         */
         public SearchItemViewHolder(View itemView) {
             super(itemView);
             itemName = (TextView) itemView.findViewById(R.id.itemName);

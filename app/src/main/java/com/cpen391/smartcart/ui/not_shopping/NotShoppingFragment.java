@@ -158,6 +158,7 @@ public class NotShoppingFragment extends Fragment {
         }
     }
 
+    // class to contain the budget remaining and items to add
     public static class BudgetAndItemsToAdd {
         public ArrayList<StatsItem> itemsToAdd;
         public BigDecimal budgetRemaining;
@@ -165,8 +166,9 @@ public class NotShoppingFragment extends Fragment {
 
     /**
      * Calculates the remaining budget and items to add to the shopping list
+     *
      * @param budgetAmount The starting budget amount
-     * @param topItems the top items that could be added to the shopping list
+     * @param topItems     the top items that could be added to the shopping list
      * @param shoppingList the current shopping list
      * @return the remaining budget and items to add to the shopping list
      */
@@ -188,6 +190,9 @@ public class NotShoppingFragment extends Fragment {
 
     /**
      * Adds an add item button to the menu bar
+     *
+     * @param menu     The menu to add button to
+     * @param inflater the inflater
      */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -197,6 +202,8 @@ public class NotShoppingFragment extends Fragment {
 
     /**
      * This functions as a onclick listener for the add item button
+     *
+     * @param item The menu item
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

@@ -146,6 +146,7 @@ public class LoginActivity extends AppCompatActivity {
 
     /**
      * Brings the user to the home screen passing the googleId to the home activity
+     * @param account The account to update ui for
      */
     private void updateUI(final GoogleSignInAccount account) {
         String googleId = account.getId();

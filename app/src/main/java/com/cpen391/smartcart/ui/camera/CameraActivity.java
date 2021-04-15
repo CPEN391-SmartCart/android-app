@@ -46,6 +46,7 @@ public class CameraActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
+        // set up member variables
         surfaceView = findViewById(R.id.surface_view);
         barcodeText = findViewById(R.id.barcode_text);
         captureButton = findViewById(R.id.capture);
@@ -82,18 +83,20 @@ public class CameraActivity extends AppCompatActivity {
             }
         });
 
+        // make a new barcode detector
         BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(this)
                 .setBarcodeFormats(Barcode.ALL_FORMATS)
                 .build();
 
         cameraSource = new CameraSource.Builder(this, barcodeDetector)
                 .setRequestedPreviewSize(1920, 1080)
-                .setAutoFocusEnabled(true) //you should add this feature
+                .setAutoFocusEnabled(true)
                 .build();
 
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
+                // we need camera permissions
                 try {
                     if (ActivityCompat.checkSelfPermission(CameraActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                         cameraSource.start(surfaceView.getHolder());
@@ -123,7 +126,6 @@ public class CameraActivity extends AppCompatActivity {
         barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
             @Override
             public void release() {
-                // Toast.makeText(getApplicationContext(), "To prevent memory leaks barcode scanner has been stopped", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -143,6 +145,7 @@ public class CameraActivity extends AppCompatActivity {
                                 barcodeData = barcodes.valueAt(0).displayValue;
                             }
                             if (!barcodeText.getText().toString().equals(barcodeData)) {
+                                // we found a bar code
                                 barcodeText.setText(barcodeData);
                                 toneGenerator.startTone(ToneGenerator.TONE_CDMA_PIP, 150);
                             }

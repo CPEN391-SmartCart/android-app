@@ -46,7 +46,7 @@ public class NotShoppingQuantityDialogFragment extends DialogFragment {
         numPicerParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
 
         linearLayout.setLayoutParams(params);
-        linearLayout.addView(aNumberPicker,numPicerParams);
+        linearLayout.addView(aNumberPicker, numPicerParams);
 
         // Setup for the bottom buttons
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
@@ -58,8 +58,7 @@ public class NotShoppingQuantityDialogFragment extends DialogFragment {
                             @SuppressLint("DefaultLocale")
                             public void onClick(DialogInterface dialog,
                                                 int id) {
-                                if (notShoppingViewModel.getNextPathedItem() == null && shoppingViewModel.isSessionActive().getValue())
-                                {
+                                if (notShoppingViewModel.getNextPathedItem() == null && shoppingViewModel.isSessionActive().getValue()) {
                                     int pathedBarcodeLength = 3 + notShoppingViewModel.getNextItem().getBarcode().length();
                                     // Tell the path planner the starting barcode
                                     notShoppingViewModel.getBluetooth().send(String.format("%02d", pathedBarcodeLength) + "ps:" + notShoppingViewModel.getNextItem().getBarcode());
